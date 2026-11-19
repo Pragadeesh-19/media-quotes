@@ -65,7 +65,7 @@ Short ADRs for the choices a reviewer would ask about. The first draft (27 Java-
 - **Decision:** 1 to 2 days of articles labelled by hand in `eval/`. `mqc eval` reports precision and recall for article detection and quote selection.
 - **Consequence:** About half a day of manual labelling by the author. The README cites only these numbers.
 
-## ADR-010 Known limits accepted for the time budget (source onboarding superseded by ADR-016)
+## ADR-010 Known limits accepted for the time budget (source onboarding superseded by ADR-016, PDF by ADR-017)
 
 - **Date:** 2026-11-19
 - **Decision:** No PDF extraction (BBC and Reuters are HTML). No source auto-profiler: a new outlet is one JSON config file. No cross-outlet duplicate merging.
@@ -111,3 +111,9 @@ Short ADRs for the choices a reviewer would ask about. The first draft (27 Java-
 - **Decision:** `mqc add-source <homepage>` reads the homepage, finds RSS/Atom feeds it advertises (or tries common feed paths), keeps feeds whose items are on the outlet's own domain, proves one article extracts with the generic extractor, and writes `config/sources/<id>.json` with the feeds as daily channels and their Wayback snapshots as history channels. `--backfill-from 2026-10-01` collects the outlet's quotes from that date.
 - **Demo:** The Kyiv Independent was onboarded with one command. ISW (understandingwar.org) was the first choice, but its homepage returns 403 to our honestly identified client and its feeds and sub-sitemaps are blocked, so `add-source` reports that instead of guessing.
 - **Limit:** outlets without any reachable feed need a hand-written config.
+
+## ADR-017 PDF articles go through the same extractor as HTML
+
+- **Date:** 2026-11-19
+- **Context:** Brief 4: "process media articles regardless of their size or content type". Think tanks often publish PDFs.
+- **Decision:** A response that is a PDF (by content type or `%PDF-` header) is converted with pypdf into an `<article>` of paragraphs, repairing words hyphenated across lines, and then extracted, segmented and verified like any HTML page. Unreadable PDFs and other content types (video, images) are recorded as unreachable with the reason.

@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 
+import httpx
+
 from mqc.net import Http, HttpFailure
+from mqc.pdf import PdfError, pdf_to_html
 from mqc.syndication import find_partner_copy
 
 WAYBACK_CDX = "https://web.archive.org/cdx/search/cdx"
@@ -43,9 +46,9 @@ def fetch_article(request: FetchRequest, methods: list[str], http: Http) -> Fetc
 
 def _direct(request: FetchRequest, http: Http) -> Fetched | Unreachable:
     response = http.get(request.url)
-    if response.status_code == 200 and "html" in response.headers.get("content-type", ""):
-        return Fetched(response.text, str(response.url), "direct")
-    return Unreachable(f"HTTP {response.status_code}")
+    if response.status_code != 200:
+        return Unreachable(f"HTTP {response.status_code}")
+    return _document(response, str(response.url), "direct")
 
 
 def _wayback(request: FetchRequest, http: Http) -> Fetched | Unreachable:
@@ -60,7 +63,19 @@ def _wayback(request: FetchRequest, http: Http) -> Fetched | Unreachable:
     snapshot = http.get(snapshot_url)
     if snapshot.status_code != 200:
         return Unreachable(f"archive snapshot HTTP {snapshot.status_code}")
-    return Fetched(snapshot.text, snapshot_url, "wayback")
+    return _document(snapshot, snapshot_url, "wayback")
+
+
+def _document(response: httpx.Response, retrieval_url: str, method: str) -> Fetched | Unreachable:
+    content_type = response.headers.get("content-type", "").lower()
+    if "pdf" in content_type or response.content[:5] == b"%PDF-":
+        try:
+            return Fetched(pdf_to_html(response.content), retrieval_url, method)
+        except PdfError as error:
+            return Unreachable(str(error))
+    if "html" in content_type or not content_type:
+        return Fetched(response.text, retrieval_url, method)
+    return Unreachable(f"unsupported content type {content_type}")
 
 
 def _syndication(request: FetchRequest, http: Http) -> Fetched | Unreachable:
