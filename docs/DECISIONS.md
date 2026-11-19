@@ -96,3 +96,10 @@ Short ADRs for the choices a reviewer would ask about. The first draft (27 Java-
 - **Date:** 2026-11-19
 - **Context:** On 2026-11-19 every full Flash model answered 503 "high demand", while Flash-Lite models answered in 4 to 9 seconds. `gemini-2.5-flash` is closed to new users.
 - **Decision:** `MQC_LLM_MODELS` is an ordered list (default `gemini-3.8-flash,gemini-3.5-flash-lite`). A model that fails on capacity (429/5xx/timeout) is skipped for the rest of the run. The model used for each article is in the run log, and the cache key includes the model.
+
+## ADR-015 Backfill sources: archived BBC feeds; Reuters only as far back as news search reaches
+
+- **Date:** 2026-11-19
+- **Context:** Backfill from 2026-10-01 needs dated article lists. Measured: BBC topic pages ignore `?page=` (older items load through an undocumented API); BBC archive sitemaps have no titles or publication dates; the GDELT API answered 429 even at one request per 12 s and empty results otherwise; Wayback index queries on reuters.com time out (504).
+- **Decision:** BBC history comes from Wayback snapshots of its RSS feeds (world feed captured on 49 of the 50 days since 2026-10-01). Before fetching, a candidate must contain a war term in its title, summary or URL; the rest are stored as irrelevant with that reason. Reuters history uses extra Bing News queries, which reach back only a few weeks; older Reuters coverage is a documented gap, and the daily run closes it going forward.
+- **Alternatives:** Fetching every BBC article in the archive sitemaps (about 10,000 page loads); decoding BBC's topic API (fragile); GDELT (unavailable).
