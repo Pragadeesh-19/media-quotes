@@ -1,0 +1,293 @@
+{
+  "date": "2026-11-18",
+  "instructions": "Set relevant to true or false. For relevant articles, paste every material quote (copied from the article) into material_quotes. Add any war article the list misses.",
+  "articles": [
+    {
+      "url": "https://www.bbc.co.uk/news/articles/c32l507ev4v4o",
+      "title": "Inside the old gas pipeline where Ukraine is fighting an underground war",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/c6742m39xgzxo",
+      "title": "Anthropic raises $81bn in record-breaking stock market debut",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/c6lyw490z14jo",
+      "title": "Parents jailed for torture and death of four-year-old girl in France nearly 40 years ago",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/c6x284pnn4e2o",
+      "title": "Julio Iglesias faces court investigation over alleged sexual offences",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/c9n70gd320mpo",
+      "title": "Steve Rosenberg: Historic talks with Xi and Trump are a coup for Putin",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cj4gnpzll020o",
+      "title": "Simon Jack: Can Anthropic's record-breaking IPO stop the AI bubble bursting?",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/ck792dez8dp3o",
+      "title": "Falcon 6X: Why Ghana is facing backlash over new $60m presidential jet",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/ck9d75x5wwwwo",
+      "title": "Trump shakes hands with Putin and Xi ahead of historic talks in China",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cm15ezz8n394o",
+      "title": "Pakistani man sentenced to 27 years for Iran-backed plot to kill Trump",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cm2d93z0e9gjo",
+      "title": "Fiona the hippo undergoing care after swallowing a hat at Cincinnati Zoo",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cm2d93zpnyxeo",
+      "title": "Surrey group completes Heathrow to Rome Fiat 500 challenge",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cm87987w1qz5o",
+      "title": "British hacker who stole $11m jailed for six years in US",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cmd7159vlr85o",
+      "title": "Anthropic: The seven founders about to become multi-billionaires",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cmgrenln8p29o",
+      "title": "Google declines UK request for Russell Brand YouTube video to be removed, sources say",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cmy49873dn95o",
+      "title": "Hakeem Jeffries nominated to be US Speaker of the House",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cmy86pp336qlo",
+      "title": "Waymo temporarily pulls driverless taxis from all US freeways",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cq20xg80ly47o",
+      "title": "Russian arrested for spying on US defence company Palantir over Ukraine support",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cq4gn3109pzgo",
+      "title": "The EU that Burnham is eyeing up is very different to the one Britain left",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cq62ped2ypy4o",
+      "title": "William and Kate meet PM Modi as they wrap up India tour",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cqev3v2ygzlvo",
+      "title": "Democrat Mary Peltola unseats Republican in Alaska Senate race",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/crkgvxxwpwz2o",
+      "title": "Rubio says tech outages are not part of 'systemic attack' against US",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cw4gn9jeqjq7o",
+      "title": "Kuwait says it repelled first Iranian attack in two months after US strikes island",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cw8r7510degno",
+      "title": "Israeli military completes ground operation in Gaza beyond Yellow Line",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cw8r75xm8v4po",
+      "title": "GTA 6 reviews say highly-anticipated game is a masterpiece",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.bbc.co.uk/news/articles/cx053jrv9rz9o",
+      "title": "Lobito Corridor: Can Trump-backed mineral highway bring peace and prosperity to DR Congo and Angola?",
+      "source_id": "bbc",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://kyivindependent.com/russia-will-achieve-none-of-its-objectives-zelensky-details-upcoming-allies-meeting/",
+      "title": "'Russia will achieve none of its objectives' — Zelensky details upcoming allies meeting",
+      "source_id": "kyivindependent",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://kyivindependent.com/ukraine-war-latest-drones-strike-2-russian-oil-refineries-in-krasnodar-krai-kyiv-says/",
+      "title": "Ukraine war latest: Drones strike 2 Russian oil refineries in Krasnodar Krai, Kyiv says",
+      "source_id": "kyivindependent",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://kyivindependent.com/ukrainian-influencer-accused-of-fraud-money-laundering-arrested-by-italian-police/",
+      "title": "Ukrainian influencer accused of fraud, money laundering arrested by Italian police",
+      "source_id": "kyivindependent",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://kyivindependent.com/unacceptable-attempt-at-intimidation-russian-man-charged-with-spying-targeting-silicon-valley/",
+      "title": "'Unacceptable attempt at intimidation' — Russian man charged with spying, targeting Silicon Valley",
+      "source_id": "kyivindependent",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/business/aerospace-defense/operation-vivaldi-ukraine-melds-man-machine-repel-russians-2026-11-18/",
+      "title": "Operation Vivaldi: Ukraine melds man and machine to repel Russians",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/business/aerospace-defense/russian-military-aircraft-deployment-sends-potent-message-asia-2026-11-18/",
+      "title": "Russian military aircraft deployment sends potent message to Asia",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/business/energy/drone-attacks-nearly-halve-russias-november-oil-refining-sources-say-2026-11-18/",
+      "title": "Drone attacks nearly halve Russia's November oil refining, sources say",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/business/energy/putin-says-eus-russian-energy-ban-caused-humiliating-fall-eu-living-standards-2026-11-18/",
+      "title": "Putin says EU's Russian energy ban caused a 'humiliating' fall in EU living standards",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/business/finance/italy-leaning-towards-unconditional-approval-intesa-takeover-bid-mps-sources-say-2026-11-18/",
+      "title": "Italy leaning towards unconditional approval of Intesa's MPS bid, sources say",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/world/china/trumps-historic-meeting-with-xi-putin-headlines-asia-trip-2026-11-18/",
+      "title": "China and Russia release 'peace declaration' after Trump, Xi, Putin meeting",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/world/china/ukraines-european-allies-meet-berlin-show-support-2026-11-19/",
+      "title": "Ukraine's European allies meet in Berlin in show of support",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/world/chinas-xi-calls-free-open-trade-apec-summit-2026-11-18/",
+      "title": "Xi, Putin blast Western 'protectionism' and sanctions as Trump lands in China",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/world/eu-proposes-new-45-billion-loan-ukraine-2027-be-repaid-by-russia-2026-11-18/",
+      "title": "EU proposes €45 billion Ukraine loan, to be repaid after Russia pays reparations",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/world/europe/russian-attacks-ukrainian-city-odesa-kill-four-officials-say-2026-11-18/",
+      "title": "Russian attacks on Ukrainian city of Odesa kill four, officials say",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/world/russia-says-us-despite-current-sanctions-will-likely-need-more-its-uranium-2026-11-18/",
+      "title": "Russia says US, despite current sanctions, will likely need more of its uranium in future",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    },
+    {
+      "url": "https://www.reuters.com/world/trump-envoys-witkoff-kushner-expected-berlin-ukraine-talks-says-us-2026-11-18/",
+      "title": "Trump envoys Witkoff and Kushner expected in Berlin for Ukraine talks, says US",
+      "source_id": "reuters",
+      "relevant": null,
+      "material_quotes": []
+    }
+  ]
+}
