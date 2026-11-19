@@ -8,8 +8,8 @@ from mqc.digest import build_digest, render_quote, validate_edges, window
 from mqc.llm import LlmError, LlmUnavailable
 from mqc.models import ArticleStatus
 from mqc.net import Http
-from mqc.pipeline import Context, discover_all, process_queue
-from mqc.prompts import SELECTION_SYSTEM, SUMMARY_SYSTEM, SUPERSESSION_SYSTEM
+from mqc.pipeline import Context, discover_all, process_queue, reselect
+from mqc.prompts import PROMPT_VERSION, SELECTION_SYSTEM, SUMMARY_SYSTEM, SUPERSESSION_SYSTEM
 from mqc.relevance import RelevanceFilter
 from mqc.runlog import RunLog
 from mqc.store import Store
@@ -216,9 +216,10 @@ def test_superseded_quote_is_hidden_in_digest(ctx):
         "VALUES ('later', 'bbc', 'https://www.bbc.co.uk/news/articles/later', 'Later', '2026-11-19T09:00:00+00:00',"
         " 'rss', 'done', '2026-11-19')")
     ctx.store.conn.execute(
-        "INSERT INTO quotes VALUES ('newq', 'later', 'The bridge will not be rebuilt this year, officials said.', "
-        "'b0.s0', 'b0.s0', 'authorial', NULL, 'Conflicting Parties'' Resources', 'resources/bridge', 'state', "
-        "'2026-11-19', 'r')")
+        "INSERT INTO quotes (quote_id, article_id, text, start_sid, end_sid, kind, speaker, section, topic_key, "
+        "claim_type, extracted_at, run_id) VALUES ('newq', 'later', 'The bridge will not be rebuilt this year, "
+        "officials said.', 'b0.s0', 'b0.s0', 'authorial', NULL, 'Conflicting Parties'' Resources', "
+        "'resources/bridge', 'state', '2026-11-19', 'r')")
     ctx.llm.superseded = {"superseded": [{"old": old_id, "new": "newq", "reason": "repair outlook revised"}]}
 
     markdown = build_digest(ctx.store, ctx.llm, date(2026, 11, 19), ctx.log, ["BBC News"])
@@ -226,3 +227,54 @@ def test_superseded_quote_is_hidden_in_digest(ctx):
     assert "will be rebuilt" not in markdown
     assert "will not be rebuilt this year" in markdown
     assert "1 older quotes hidden as superseded" in markdown
+
+
+def _quote(start: str, topic: str = "war-intensity/crimean-bridge/attacks") -> dict:
+    return {"start": start, "end": start, "kind": "authorial", "speaker": None,
+            "section": "War Intensity & Battlefield", "topic_key": topic, "claim_type": "state"}
+
+
+def test_selection_is_capped_at_five_quotes_per_article(ctx):
+    ctx.llm.selection = {"quotes": [_quote(f"b{i}.s0") for i in (0, 1, 2, 3, 5, 6, 7)]}
+    discover_all(ctx, ["bbc"])
+    process_queue(ctx, ["bbc"])
+    assert ctx.store.conn.execute("SELECT COUNT(*) FROM quotes").fetchone()[0] == 5
+    events = [json.loads(l) for l in ctx.log.path.read_text(encoding="utf-8").splitlines()]
+    assert next(e for e in events if e["event"] == "quotes")["dropped_over_cap"] == 2
+
+
+def test_reselect_replaces_quotes_and_drops_their_supersession_links(ctx):
+    ctx.llm.selection = {"quotes": [_quote("b0.s0"), _quote("b1.s0")]}
+    discover_all(ctx, ["bbc"])
+    process_queue(ctx, ["bbc"])
+    old_ids = [r[0] for r in ctx.store.conn.execute("SELECT quote_id FROM quotes ORDER BY start_sid")]
+    ctx.store.add_supersession(old_ids[0], old_ids[1], "test link")
+
+    ctx.llm.selection = {"quotes": [_quote("b5.s0")]}
+    reselect(ctx, ["bbc"], date(2026, 11, 19), date(2026, 11, 19))
+
+    rows = ctx.store.conn.execute("SELECT start_sid, prompt_version FROM quotes").fetchall()
+    assert [tuple(r) for r in rows] == [("b5.s0", PROMPT_VERSION)]
+    assert ctx.store.conn.execute("SELECT COUNT(*) FROM supersessions").fetchone()[0] == 0
+    status = ctx.store.conn.execute("SELECT status FROM articles WHERE url = ?", (BBC_URL,)).fetchone()[0]
+    assert status == ArticleStatus.DONE
+
+
+def test_failed_reselect_keeps_the_existing_quotes(ctx):
+    ctx.llm.selection = {"quotes": [_quote("b0.s0")]}
+    discover_all(ctx, ["bbc"])
+    process_queue(ctx, ["bbc"])
+    ctx.llm.selection = LlmError("bad JSON")
+    reselect(ctx, ["bbc"], date(2026, 11, 19), date(2026, 11, 19))
+    assert ctx.store.conn.execute("SELECT COUNT(*) FROM quotes").fetchone()[0] == 1
+    row = ctx.store.conn.execute("SELECT status, attempts FROM articles WHERE url = ?", (BBC_URL,)).fetchone()
+    assert (row["status"], row["attempts"]) == (ArticleStatus.DONE, 0)
+
+
+def test_reselect_outside_the_period_touches_nothing(ctx):
+    ctx.llm.selection = {"quotes": [_quote("b0.s0")]}
+    discover_all(ctx, ["bbc"])
+    process_queue(ctx, ["bbc"])
+    ctx.llm.selection = {"quotes": [_quote("b5.s0")]}
+    reselect(ctx, ["bbc"], date(2026, 11, 1), date(2026, 11, 18))
+    assert [r[0] for r in ctx.store.conn.execute("SELECT start_sid FROM quotes")] == ["b0.s0"]

@@ -56,7 +56,8 @@ CREATE TABLE IF NOT EXISTS quotes (
     topic_key TEXT NOT NULL,
     claim_type TEXT NOT NULL,
     extracted_at TEXT NOT NULL,
-    run_id TEXT NOT NULL
+    run_id TEXT NOT NULL,
+    prompt_version TEXT NOT NULL DEFAULT 'v1'
 );
 CREATE INDEX IF NOT EXISTS idx_quotes_article ON quotes(article_id);
 CREATE INDEX IF NOT EXISTS idx_quotes_section_topic ON quotes(section, topic_key);
@@ -92,6 +93,13 @@ class Store:
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.conn.execute("PRAGMA journal_mode = DELETE")
         self.conn.executescript(SCHEMA)
+        self._migrate()
+
+    def _migrate(self) -> None:
+        columns = {row["name"] for row in self.conn.execute("PRAGMA table_info(quotes)")}
+        if "prompt_version" not in columns:
+            with self.conn:
+                self.conn.execute("ALTER TABLE quotes ADD COLUMN prompt_version TEXT NOT NULL DEFAULT 'v1'")
 
     def close(self) -> None:
         self.conn.close()
@@ -163,14 +171,35 @@ class Store:
                        published_at_source=row["published_at_source"], retrieval_url=row["retrieval_url"],
                        retrieval_method=row["retrieval_method"], blocks=blocks)
 
-    def save_quotes(self, quotes: list[Quote], run_id: str) -> int:
-        extracted_at = now_iso()
+    def save_quotes(self, quotes: list[Quote], run_id: str, prompt_version: str = "v1") -> int:
         with self.conn:
-            cursor = self.conn.executemany(
-                "INSERT OR IGNORE INTO quotes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                [(q.quote_id, q.article_id, q.text, q.start_sid, q.end_sid, q.kind, q.speaker, q.section,
-                  q.topic_key, q.claim_type, extracted_at, run_id) for q in quotes])
+            return self._insert_quotes(quotes, run_id, prompt_version)
+
+    def replace_quotes(self, article_id: str, quotes: list[Quote], run_id: str, prompt_version: str) -> int:
+        """Swap an article's quotes in one transaction, dropping supersession links that touched the old ones."""
+        with self.conn:
+            old = "SELECT quote_id FROM quotes WHERE article_id = ?"
+            self.conn.execute(f"DELETE FROM supersessions WHERE old_quote_id IN ({old}) OR new_quote_id IN ({old})",
+                              (article_id, article_id))
+            self.conn.execute("DELETE FROM quotes WHERE article_id = ?", (article_id,))
+            return self._insert_quotes(quotes, run_id, prompt_version)
+
+    def _insert_quotes(self, quotes: list[Quote], run_id: str, prompt_version: str) -> int:
+        extracted_at = now_iso()
+        cursor = self.conn.executemany(
+            "INSERT OR IGNORE INTO quotes (quote_id, article_id, text, start_sid, end_sid, kind, speaker, section, "
+            "topic_key, claim_type, extracted_at, run_id, prompt_version) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [(q.quote_id, q.article_id, q.text, q.start_sid, q.end_sid, q.kind, q.speaker, q.section,
+              q.topic_key, q.claim_type, extracted_at, run_id, prompt_version) for q in quotes])
         return cursor.rowcount
+
+    def processed_articles(self, start: datetime, end: datetime, source_id: str) -> list[str]:
+        rows = self.conn.execute(
+            "SELECT article_id FROM articles WHERE status = ? AND source_id = ? AND published_at >= ? "
+            "AND published_at < ? ORDER BY published_at, article_id",
+            (ArticleStatus.DONE, source_id, start.isoformat(), end.isoformat())).fetchall()
+        return [r["article_id"] for r in rows]
 
     def topic_keys(self, start: datetime, end: datetime) -> list[str]:
         rows = self.conn.execute(
@@ -217,7 +246,7 @@ class Store:
     def export_json(self, path: Path) -> int:
         rows = self.conn.execute(
             "SELECT q.quote_id, q.text, q.kind, q.speaker, q.section, q.topic_key, q.claim_type, q.start_sid, "
-            "q.end_sid, q.extracted_at, q.run_id, a.article_id, a.title AS article_title, a.url AS article_url, "
+            "q.end_sid, q.extracted_at, q.run_id, q.prompt_version, a.article_id, a.title AS article_title, a.url AS article_url, "
             "a.published_at, a.retrieval_method, a.retrieval_url, s.source_id, s.name AS source_name, "
             "s.publication_name, (SELECT new_quote_id FROM supersessions WHERE old_quote_id = q.quote_id "
             "ORDER BY new_quote_id LIMIT 1) AS superseded_by "

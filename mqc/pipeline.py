@@ -1,6 +1,6 @@
 from collections import Counter
 from dataclasses import dataclass, field
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 
 from mqc.config import SourceConfig
 from mqc.discovery import DiscoveryReport, discover, discover_period
@@ -12,6 +12,7 @@ from mqc.models import ArticleStatus, Candidate
 from mqc.net import Http
 from mqc.relevance import RelevanceFilter
 from mqc.runlog import RunLog
+from mqc.prompts import PROMPT_VERSION
 from mqc.selection import select_quotes
 from mqc.store import Store
 from mqc.verify import Rejection, build_quote, unverified_speaker
@@ -85,6 +86,21 @@ def process_article(ctx: Context, row) -> None:
     if ArticleStatus(row["status"]) in FETCH_STATUSES:
         if not _fetch_and_judge(ctx, row, config):
             return
+    select_and_store(ctx, article_id, config, replace=False)
+
+
+def reselect(ctx: Context, source_ids: list[str], start: date, end: date) -> None:
+    """Run quote selection again for articles already processed in the period, replacing their quotes."""
+    first = datetime.combine(start, time.min, tzinfo=UTC)
+    last = datetime.combine(end + timedelta(days=1), time.min, tzinfo=UTC)
+    for source_id in source_ids:
+        for article_id in ctx.store.processed_articles(first, last, source_id):
+            if ctx.llm_unavailable:
+                return
+            select_and_store(ctx, article_id, ctx.sources[source_id], replace=True)
+
+
+def select_and_store(ctx: Context, article_id: str, config: SourceConfig, replace: bool) -> None:
     if ctx.llm_unavailable:
         return
     article = ctx.store.load_article(article_id)
@@ -96,8 +112,9 @@ def process_article(ctx: Context, row) -> None:
         ctx.log.event("warning", "llm_unavailable", detail=str(error))
         return
     except LlmError as error:
-        ctx.store.mark(article_id, ArticleStatus.RELEVANT, f"LLM: {error}", failed=True)
         ctx.log.event("error", "selection_failed", article_id=article_id, error=str(error))
+        if not replace:
+            ctx.store.mark(article_id, ArticleStatus.RELEVANT, f"LLM: {error}", failed=True)
         return
     quotes, rejections, speakers_dropped = [], [], []
     for proposal in selection.proposals:
@@ -107,12 +124,16 @@ def process_article(ctx: Context, row) -> None:
             proposal = proposal.model_copy(update={"speaker": None})
         result = build_quote(proposal, article, config)
         (rejections if isinstance(result, Rejection) else quotes).append(result)
-    saved = ctx.store.save_quotes(quotes, ctx.log.run_id)
+    if replace:
+        saved = ctx.store.replace_quotes(article_id, quotes, ctx.log.run_id, PROMPT_VERSION)
+    else:
+        saved = ctx.store.save_quotes(quotes, ctx.log.run_id, PROMPT_VERSION)
     ctx.store.mark(article_id, ArticleStatus.DONE, f"{len(quotes)} quotes, {len(rejections)} rejected")
     ctx.stats["quotes_saved"] += saved
     ctx.stats["quotes_rejected"] += len(rejections)
     ctx.log.event("info", "quotes", article_id=article_id, model=getattr(ctx.llm, "last_model", None),
-                  proposed=len(selection.proposals), saved=saved,
+                  prompt_version=PROMPT_VERSION, replaced=replace, proposed=len(selection.proposals),
+                  dropped_over_cap=selection.dropped_over_cap, saved=saved,
                   rejected=[f"{r.rule}: {r.detail}" for r in rejections], speakers_dropped=speakers_dropped,
                   invalid=selection.invalid)
 

@@ -8,12 +8,14 @@ from mqc.prompts import SELECTION_SYSTEM
 
 MAX_CHUNK_CHARS = 40_000
 CHUNK_OVERLAP_BLOCKS = 2
+MAX_QUOTES_PER_ARTICLE = 5
 
 
 @dataclass
 class Selection:
     proposals: list[SpanProposal] = field(default_factory=list)
     invalid: list[str] = field(default_factory=list)
+    dropped_over_cap: int = 0
 
 
 def select_quotes(article: Article, llm: LlmClient, existing_topic_keys: list[str]) -> Selection:
@@ -30,6 +32,8 @@ def select_quotes(article: Article, llm: LlmClient, existing_topic_keys: list[st
             if (proposal.start, proposal.end) not in seen:
                 seen.add((proposal.start, proposal.end))
                 selection.proposals.append(proposal)
+    selection.dropped_over_cap = len(selection.proposals[MAX_QUOTES_PER_ARTICLE:])
+    selection.proposals = selection.proposals[:MAX_QUOTES_PER_ARTICLE]
     return selection
 
 
