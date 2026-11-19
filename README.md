@@ -132,8 +132,16 @@ Things failed constantly, and each failure became a rule:
 
 - **Every decision is logged.** `logs/<run_id>.jsonl` records each discovery, relevance verdict with matched terms, rejected quote with the rule that rejected it, dropped speaker, and supersession with its reason.
 - **Git history is an audit trail.** The daily job commits the database, the JSON export and the digest, so each day's additions are a visible diff.
-- **Tests.** 93 tests run on every push without network access, against saved real BBC, AOL and Bing pages. They cover every verification rule (including frankenquote attempts), the fetch chain under 401, 429 and timeouts, supersession, verbatim rendering, backfill, onboarding and PDFs.
-- **Evaluation.** `mqc eval template --date D` writes a blind labelling file for a day (the system's decisions are not shown). `mqc eval score` reports precision and recall for article detection and, at sentence level, quote selection, and writes `eval/results.md`. The template for 18 November ([`eval/labels/2026-11-18.json`](eval/labels/2026-11-18.json), 41 articles) is committed but not yet labelled, so this repository makes no recall or precision claim yet. Unreachable Reuters articles count as misses when labelled relevant, because they really were not collected.
+- **Tests.** 94 tests run on every push without network access, against saved real BBC, AOL and Bing pages. They cover every verification rule (including frankenquote attempts), the fetch chain under 401, 429 and timeouts, supersession, verbatim rendering, backfill, onboarding and PDFs.
+- **Evaluation.** `mqc eval template --date D` writes a blind labelling file for a day (the system's decisions are not shown); `mqc eval score` reports precision and recall and writes [`eval/results.md`](eval/results.md). For 18 November (41 articles, labels in [`eval/labels/2026-11-18.json`](eval/labels/2026-11-18.json)), the labels were produced by an independent model reading only the article text, blind to the system's selections, and are pending my review:
+
+  | Stage | Precision | Recall |
+  |---|---|---|
+  | Article detection, all labelled articles | 90% (9/10) | 50% (9/18) |
+  | Article detection, articles that could be read | 90% (9/10) | 100% (9/9) |
+  | Quote selection, processed articles (sentence overlap) | 43% (19/44) | 63% (19/30) |
+
+  What this says: the relevance filter missed no readable war article that day, and its one false positive was a fraud story with "Ukrainian" in the headline, the cost of favouring recall. All nine missed articles were Reuters articles that were found but could not be read, which is the access limit described above, not a detection failure. Quote selection over-selects: most quotes that day were chosen by the Lite fallback models, and fewer than half matched a labelled material quote. Tightening the selection prompt and measuring again against these labels is the next step.
 
 ## 4. What I built
 
@@ -196,7 +204,7 @@ mqc digest --date 2026-11-19                            # rebuild one digest fro
 mqc site                                                # build the dashboard into site/
 mqc eval template --date 2026-11-18                     # blank labelling file for one day
 mqc eval score                                          # precision and recall against the labels
-pytest                                                  # 93 tests, no network needed
+pytest                                                  # 94 tests, no network needed
 ```
 
 The LLM can be any OpenAI-compatible endpoint. `MQC_LLM_MODELS` is an ordered fallback list (default `gemini-3.8-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite`), and responses are cached by request hash.
@@ -206,6 +214,6 @@ The LLM can be any OpenAI-compatible endpoint. `MQC_LLM_MODELS` is an ordered fa
 ## 7. Known limits
 
 - **Reuters coverage is partial.** It depends on finding a licensed partner copy, and older Reuters articles only go back as far as Bing's news index. Unreadable Reuters articles are listed with title, date and link, not hidden.
-- **Free-tier LLM capacity.** Gemini's free tier often answers 503 or 429, so collection catches up over several daily runs rather than in one. Most quotes so far were selected by the Lite fallback models, which pick generously; the evaluation is how to measure that.
+- **Free-tier LLM capacity.** Gemini's free tier often answers 503 or 429, so collection catches up over several daily runs rather than in one. Most quotes so far were selected by the Lite fallback models, which pick generously: quote-selection precision on the labelled day is 43%.
 - **Outlets that block automated clients** cannot be added (ISW returned 403).
 - **Paywalled outlets** (FT, Bloomberg, The Economist) are out of reach by design (I7).
