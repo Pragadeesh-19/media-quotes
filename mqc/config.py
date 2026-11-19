@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_DIR = ROOT / "config"
-DEFAULT_MODELS = "gemini-3.8-flash,gemini-3.5-flash-lite"
+DEFAULT_MODELS = "gemini-3.8-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite"
 
 
 class Channel(BaseModel):

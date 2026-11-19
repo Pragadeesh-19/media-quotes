@@ -95,7 +95,7 @@ Short ADRs for the choices a reviewer would ask about. The first draft (27 Java-
 
 - **Date:** 2026-11-19
 - **Context:** On 2026-11-19 every full Flash model answered 503 "high demand", while Flash-Lite models answered in 4 to 9 seconds. `gemini-2.5-flash` is closed to new users.
-- **Decision:** `MQC_LLM_MODELS` is an ordered list (default `gemini-3.8-flash,gemini-3.5-flash-lite`). A model that fails on capacity (429/5xx/timeout) is skipped for the rest of the run. The model used for each article is in the run log, and the cache key includes the model.
+- **Decision:** `MQC_LLM_MODELS` is an ordered list (default `gemini-3.8-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite`). A model that fails on capacity (429/5xx/timeout) is skipped for the rest of the run. The model used for each article is in the run log, and the cache key includes the model.
 
 ## ADR-015 Backfill sources: archived BBC feeds; Reuters only as far back as news search reaches
 

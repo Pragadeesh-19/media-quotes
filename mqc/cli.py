@@ -63,7 +63,7 @@ def _context(args, command: str) -> Context:
     run_id = new_run_id()
     store.start_run(run_id, command)
     http = Http()
-    llm = OpenAiCompatibleClient(llm_settings(), Http(min_interval=4.0, max_retries=1), LLM_CACHE_DIR,
+    llm = OpenAiCompatibleClient(llm_settings(), Http(min_interval=4.0, max_retries=3), LLM_CACHE_DIR,
                                  getattr(args, "max_llm_calls", None))
     return Context(store=store, http=http, llm=llm, relevance=RelevanceFilter(load_lexicon()), sources=sources,
                    log=RunLog(run_id, LOG_DIR))
