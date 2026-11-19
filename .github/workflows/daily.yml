@@ -11,6 +11,9 @@ on:
       end:
         description: "Backfill end date (YYYY-MM-DD)"
         required: false
+      source:
+        description: "Limit the backfill to one source id (empty means all sources)"
+        required: false
 
 permissions:
   contents: write
@@ -43,7 +46,8 @@ jobs:
           MQC_LLM_API_KEY: ${{ secrets.MQC_LLM_API_KEY }}
           START: ${{ inputs.start }}
           END: ${{ inputs.end }}
-        run: mqc backfill --start "$START" --end "$END" --max-llm-calls 400
+          SOURCE: ${{ inputs.source }}
+        run: mqc backfill --start "$START" --end "$END" ${SOURCE:+--source "$SOURCE"} --max-llm-calls 400
       - name: Daily collection and digest
         env:
           MQC_LLM_API_KEY: ${{ secrets.MQC_LLM_API_KEY }}
