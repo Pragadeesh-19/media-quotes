@@ -24,7 +24,7 @@ class BudgetExhausted(LlmUnavailable):
 
 
 class LlmClient(Protocol):
-    def complete_json(self, system: str, user: str) -> dict: ...
+    def complete_json(self, system: str, user: str) -> dict | list: ...
 
 
 class OpenAiCompatibleClient:
@@ -40,7 +40,7 @@ class OpenAiCompatibleClient:
         self.unavailable_models: dict[str, str] = {}
         self.last_model: str | None = None
 
-    def complete_json(self, system: str, user: str) -> dict:
+    def complete_json(self, system: str, user: str) -> dict | list:
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         for model in self.settings.models:
             cached = self._cache_path(model, messages)
@@ -59,7 +59,7 @@ class OpenAiCompatibleClient:
                 self.unavailable_models[model] = str(error)
         raise LlmUnavailable(f"no model available: {self.unavailable_models}")
 
-    def _call(self, model: str, messages: list[dict]) -> dict:
+    def _call(self, model: str, messages: list[dict]) -> dict | list:
         if self.max_calls is not None and self.calls >= self.max_calls:
             raise BudgetExhausted(f"LLM call budget of {self.max_calls} reached")
         self.calls += 1
@@ -96,11 +96,19 @@ def _request(model: str, messages: list[dict]) -> dict:
     return {"model": model, "temperature": 0, "response_format": {"type": "json_object"}, "messages": messages}
 
 
-def parse_json_content(content: str) -> dict:
+def parse_json_content(content: str) -> dict | list:
     try:
         parsed = json.loads(_FENCE.sub("", content.strip()))
     except json.JSONDecodeError as error:
         raise LlmError(f"model returned invalid JSON: {content[:200]!r}") from error
-    if not isinstance(parsed, dict):
-        raise LlmError("model returned JSON that is not an object")
+    if not isinstance(parsed, (dict, list)):
+        raise LlmError("model returned JSON that is neither an object nor a list")
     return parsed
+
+
+def json_list(response: dict | list, name: str) -> list:
+    """The list under `name`, accepting a bare list when the model omits the wrapping object."""
+    if isinstance(response, list):
+        return response
+    value = response.get(name, [])
+    return value if isinstance(value, list) else []

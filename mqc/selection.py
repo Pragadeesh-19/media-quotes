@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 from pydantic import ValidationError
 
-from mqc.llm import LlmClient
+from mqc.llm import LlmClient, json_list
 from mqc.models import Article, SpanProposal
 from mqc.prompts import SELECTION_SYSTEM
 
@@ -21,7 +21,7 @@ def select_quotes(article: Article, llm: LlmClient, existing_topic_keys: list[st
     seen: set[tuple[str, str]] = set()
     for blocks in chunk_blocks(article):
         response = llm.complete_json(SELECTION_SYSTEM, render_article(article, blocks, existing_topic_keys))
-        for item in response.get("quotes", []):
+        for item in json_list(response, "quotes"):
             try:
                 proposal = SpanProposal.model_validate(item)
             except ValidationError as error:

@@ -4,7 +4,7 @@ import httpx
 import pytest
 
 from mqc.config import LlmSettings
-from mqc.llm import BudgetExhausted, LlmError, LlmUnavailable, OpenAiCompatibleClient, parse_json_content
+from mqc.llm import BudgetExhausted, LlmError, LlmUnavailable, OpenAiCompatibleClient, json_list, parse_json_content
 from mqc.net import Http
 
 SETTINGS = LlmSettings(base_url="https://llm.example/v1", models=["big", "lite"], api_key="k")
@@ -85,3 +85,14 @@ def test_timeout_fails_this_request_but_keeps_the_model(tmp_path):
     assert not isinstance(error.value, LlmUnavailable)
     assert client.complete_json("s", "next article") == {"ok": 1}
     assert client.unavailable_models == {}
+
+
+def test_bare_list_is_accepted_where_an_object_was_asked():
+    assert json_list(parse_json_content('[{"start": "b0.s0"}]'), "quotes") == [{"start": "b0.s0"}]
+    assert json_list({"quotes": [1]}, "quotes") == [1]
+    assert json_list({"quotes": "oops"}, "quotes") == []
+
+
+def test_scalar_json_is_rejected():
+    with pytest.raises(LlmError, match="neither an object nor a list"):
+        parse_json_content("42")

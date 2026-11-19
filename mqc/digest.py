@@ -3,7 +3,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
 
-from mqc.llm import LlmClient, LlmError
+from mqc.llm import LlmClient, LlmError, json_list
 from mqc.models import ClaimType, Section
 from mqc.prompts import SUMMARY_SYSTEM, SUPERSESSION_SYSTEM
 from mqc.segment import split_sentences
@@ -59,7 +59,7 @@ def resolve_supersessions(store: Store, llm: LlmClient, quotes: list[dict], log)
         except LlmError as error:
             log.event("warning", "supersession_skipped", topic_key=topic_key, error=str(error))
             continue
-        accepted, rejected = validate_edges(response.get("superseded", []), group)
+        accepted, rejected = validate_edges([e for e in json_list(response, "superseded") if isinstance(e, dict)], group)
         for edge in accepted:
             store.add_supersession(edge.old, edge.new, edge.reason)
         log.event("info", "supersession", topic_key=topic_key, accepted=len(accepted), rejected=rejected)
@@ -69,7 +69,8 @@ def summarize_section(llm: LlmClient, section: Section, quotes: list[dict], log)
     user = f"Section: {section.value}\n\n" + "\n\n".join(f"- ({q['source_name']}, {q['published_at'][:10]}) {q['text']}"
                                                        for q in quotes)
     try:
-        summary = str(llm.complete_json(SUMMARY_SYSTEM, user).get("summary", "")).strip()
+        response = llm.complete_json(SUMMARY_SYSTEM, user)
+        summary = str(response.get("summary", "") if isinstance(response, dict) else "").strip()
     except LlmError as error:
         log.event("warning", "summary_failed", section=section.value, error=str(error))
         return None
