@@ -5,6 +5,7 @@ from pathlib import Path
 
 from mqc.config import ROOT, llm_settings, load_lexicon, load_sources
 from mqc.digest import build_digest
+from mqc.evaluate import render_report, score_labels, write_template
 from mqc.llm import OpenAiCompatibleClient
 from mqc.net import Http
 from mqc.pipeline import Context, discover_all, discover_backfill, process_queue
@@ -17,6 +18,8 @@ EXPORT_PATH = ROOT / "data" / "quotes.json"
 DIGEST_DIR = ROOT / "digests"
 LOG_DIR = ROOT / "logs"
 LLM_CACHE_DIR = ROOT / ".cache" / "llm"
+LABEL_DIR = ROOT / "eval" / "labels"
+EVAL_REPORT = ROOT / "eval" / "results.md"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -39,6 +42,12 @@ def main(argv: list[str] | None = None) -> int:
     digest.add_argument("--max-llm-calls", type=int)
 
     sub.add_parser("export", help="write data/quotes.json from the database")
+
+    evaluation = sub.add_parser("eval", help="hand-labelled evaluation")
+    eval_sub = evaluation.add_subparsers(dest="eval_command", required=True)
+    template = eval_sub.add_parser("template", help="write a blank labelling file for one day")
+    template.add_argument("--date", type=date.fromisoformat, required=True)
+    eval_sub.add_parser("score", help="score the system against every labelled day")
 
     args = parser.parse_args(argv)
     return COMMANDS[args.command](args)
@@ -125,7 +134,25 @@ def cmd_export(_args) -> int:
     return 0
 
 
-COMMANDS = {"daily": cmd_daily, "backfill": cmd_backfill, "digest": cmd_digest, "export": cmd_export}
+def cmd_eval(args) -> int:
+    store = Store(DB_PATH)
+    try:
+        if args.eval_command == "template":
+            path = LABEL_DIR / f"{args.date.isoformat()}.json"
+            if path.exists():
+                raise SystemExit(f"{path.relative_to(ROOT)} already exists; it may hold your labels")
+            print(f"wrote {write_template(store, args.date, path)} articles to {path.relative_to(ROOT)}")
+        else:
+            files = sorted(LABEL_DIR.glob("*.json"))
+            report = render_report(score_labels(store, files), files)
+            EVAL_REPORT.write_text(report, encoding="utf-8")
+            print(report)
+    finally:
+        store.close()
+    return 0
+
+
+COMMANDS = {"daily": cmd_daily, "backfill": cmd_backfill, "digest": cmd_digest, "export": cmd_export, "eval": cmd_eval}
 
 if __name__ == "__main__":
     sys.exit(main())
