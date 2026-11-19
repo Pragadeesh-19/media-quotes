@@ -1,0 +1,29 @@
+[project]
+name = "mqc"
+version = "0.1.0"
+description = "Media Quotes Collection System: verbatim, verified quotes on Russia's war on Ukraine"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx==0.28.1",
+    "beautifulsoup4==4.15.0",
+    "lxml==6.1.3",
+    "pydantic==2.14.3",
+    "pyahocorasick==2.3.1",
+    "pysbd==0.3.4",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==9.2.0"]
+
+[project.scripts]
+mqc = "mqc.cli:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["mqc"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
