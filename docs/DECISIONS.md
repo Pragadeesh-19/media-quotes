@@ -65,7 +65,7 @@ Short ADRs for the choices a reviewer would ask about. The first draft (27 Java-
 - **Decision:** 1 to 2 days of articles labelled by hand in `eval/`. `mqc eval` reports precision and recall for article detection and quote selection.
 - **Consequence:** About half a day of manual labelling by the author. The README cites only these numbers.
 
-## ADR-010 Known limits accepted for the time budget
+## ADR-010 Known limits accepted for the time budget (source onboarding superseded by ADR-016)
 
 - **Date:** 2026-11-19
 - **Decision:** No PDF extraction (BBC and Reuters are HTML). No source auto-profiler: a new outlet is one JSON config file. No cross-outlet duplicate merging.
@@ -103,3 +103,11 @@ Short ADRs for the choices a reviewer would ask about. The first draft (27 Java-
 - **Context:** Backfill from 2026-10-01 needs dated article lists. Measured: BBC topic pages ignore `?page=` (older items load through an undocumented API); BBC archive sitemaps have no titles or publication dates; the GDELT API answered 429 even at one request per 12 s and empty results otherwise; Wayback index queries on reuters.com time out (504).
 - **Decision:** BBC history comes from Wayback snapshots of its RSS feeds (world feed captured on 49 of the 50 days since 2026-10-01). Before fetching, a candidate must contain a war term in its title, summary or URL; the rest are stored as irrelevant with that reason. Reuters history uses extra Bing News queries, which reach back only a few weeks; older Reuters coverage is a documented gap, and the daily run closes it going forward.
 - **Alternatives:** Fetching every BBC article in the archive sitemaps (about 10,000 page loads); decoding BBC's topic API (fragile); GDELT (unavailable).
+
+## ADR-016 New outlets are onboarded from their homepage
+
+- **Date:** 2026-11-19
+- **Context:** Brief 2.3: "the user can name another media (or 'think-tank') source, and the system automatically builds a pipeline for this source".
+- **Decision:** `mqc add-source <homepage>` reads the homepage, finds RSS/Atom feeds it advertises (or tries common feed paths), keeps feeds whose items are on the outlet's own domain, proves one article extracts with the generic extractor, and writes `config/sources/<id>.json` with the feeds as daily channels and their Wayback snapshots as history channels. `--backfill-from 2026-10-01` collects the outlet's quotes from that date.
+- **Demo:** The Kyiv Independent was onboarded with one command. ISW (understandingwar.org) was the first choice, but its homepage returns 403 to our honestly identified client and its feeds and sub-sitemaps are blocked, so `add-source` reports that instead of guessing.
+- **Limit:** outlets without any reachable feed need a hand-written config.

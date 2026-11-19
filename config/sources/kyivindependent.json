@@ -1,0 +1,30 @@
+{
+  "source_id": "kyivindependent",
+  "name": "The Kyiv Independent",
+  "publication_name": "The Kyiv Independent",
+  "domains": [
+    "kyivindependent.com"
+  ],
+  "channels": [
+    {
+      "type": "rss",
+      "url": "https://kyivindependent.com/news-archive/rss/",
+      "query": null
+    }
+  ],
+  "fetch_methods": [
+    "direct",
+    "wayback"
+  ],
+  "body_selector": null,
+  "url_path_strip": null,
+  "exclude_url_patterns": [],
+  "syndication_partners": {},
+  "history_channels": [
+    {
+      "type": "wayback_feed",
+      "url": "https://kyivindependent.com/news-archive/rss/",
+      "query": null
+    }
+  ]
+}
