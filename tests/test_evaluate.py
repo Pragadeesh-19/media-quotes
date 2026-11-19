@@ -70,3 +70,18 @@ def test_unlabelled_entries_are_ignored(tmp_path, sources):
 def test_label_text_maps_to_sentence_ids():
     assert sentence_ids_for(ARTICLE, "The town is under  heavy pressure.") == {"b0.s1"}
     assert sentence_ids_for(ARTICLE, "Not in the article") == set()
+
+
+def test_unreadable_articles_are_reported_separately(tmp_path, sources):
+    store = _store(tmp_path, sources, [])
+    store.conn.execute("INSERT INTO articles (article_id, source_id, url, title, published_at, channel, status, "
+                       "discovered_at) VALUES ('r1', 'bbc', 'https://www.bbc.co.uk/news/articles/blocked', 'T', "
+                       "'2026-11-18T10:00:00+00:00', 'rss', 'unreachable', 'x')")
+    files = _labels(tmp_path, [{"url": "https://www.bbc.co.uk/news/articles/blocked", "relevant": True,
+                                "material_quotes": []},
+                               {"url": ARTICLE.url, "relevant": True, "material_quotes": []}])
+    result = score_labels(store, files)
+    assert result["articles"] == Score(1, 0, 1)
+    assert result["readable"] == Score(1, 0, 0)
+    assert result["misses"] == ["article (could not be read): https://www.bbc.co.uk/news/articles/blocked"]
+    assert result["labellers"] == {"2026-11-18": "by hand"}

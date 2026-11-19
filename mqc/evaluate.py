@@ -46,21 +46,28 @@ def write_template(store: Store, day: date, path: Path) -> int:
 
 def score_labels(store: Store, label_files: list[Path]) -> dict:
     articles = Score(0, 0, 0)
+    readable = Score(0, 0, 0)
     quotes = Score(0, 0, 0)
     misses: list[str] = []
+    labellers: dict[str, str] = {}
     for path in label_files:
-        for label in json.loads(path.read_text(encoding="utf-8"))["articles"]:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        labellers[path.stem] = data.get("labelled_by", "by hand")
+        for label in data["articles"]:
             if label["relevant"] is None:
                 continue
             row = store.conn.execute("SELECT * FROM articles WHERE url = ?", (label["url"],)).fetchone()
             predicted = row is not None and ArticleStatus(row["status"]) in SYSTEM_RELEVANT
             articles = _add(articles, predicted, label["relevant"])
+            unreadable = row is not None and row["status"] == ArticleStatus.UNREACHABLE
+            if not unreadable:
+                readable = _add(readable, predicted, label["relevant"])
             if label["relevant"] and not predicted:
-                misses.append(f"article: {label['url']}")
+                misses.append(f"article{' (could not be read)' if unreadable else ''}: {label['url']}")
             if label["relevant"] and row is not None and row["status"] == ArticleStatus.DONE:
                 article = store.load_article(row["article_id"])
                 quotes = _merge(quotes, _score_quotes(store, article, label["material_quotes"], misses))
-    return {"articles": articles, "quotes": quotes, "misses": misses}
+    return {"articles": articles, "readable": readable, "quotes": quotes, "misses": misses, "labellers": labellers}
 
 
 def sentence_ids_for(article: Article, text: str) -> set[str]:
@@ -108,12 +115,16 @@ def render_report(result: dict, label_files: list[Path]) -> str:
     def pct(value: float | None) -> str:
         return "n/a" if value is None else f"{value:.0%}"
 
-    lines = ["# Evaluation", "", f"Hand-labelled days: {', '.join(p.stem for p in label_files)}", "",
-             "| Stage | Precision | Recall | TP | FP | FN |", "|---|---|---|---|---|---|"]
-    for name, score in (("Article detection", result["articles"]), ("Quote selection", result["quotes"])):
+    lines = ["# Evaluation", "", "Labelled days:", ""]
+    lines += [f"- {day}: {who}" for day, who in result["labellers"].items()]
+    lines += ["", "| Stage | Precision | Recall | TP | FP | FN |", "|---|---|---|---|---|---|"]
+    rows = (("Article detection, all labelled articles", result["articles"]),
+            ("Article detection, articles that could be read", result["readable"]),
+            ("Quote selection (processed articles)", result["quotes"]))
+    for name, score in rows:
         lines.append(f"| {name} | {pct(score.precision)} | {pct(score.recall)} | {score.true_positive} | "
                      f"{score.false_positive} | {score.false_negative} |")
     lines += ["", "Quote matching is at sentence level: a selected quote counts as correct when it shares at "
-              "least one sentence with a hand-labelled quote.", "", "## Misses", ""]
+              "least one sentence with a labelled quote.", "", "## Misses", ""]
     lines += [f"- {m}" for m in result["misses"]] or ["- none"]
     return "\n".join(lines) + "\n"
