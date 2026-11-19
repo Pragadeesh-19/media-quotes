@@ -136,7 +136,7 @@ Things failed constantly, and each failure became a rule:
 - **Every decision is logged.** `logs/<run_id>.jsonl` records each discovery, relevance verdict with matched terms, rejected quote with the rule that rejected it, dropped speaker, and supersession with its reason.
 - **Git history is an audit trail.** The daily job commits the database, the JSON export and the digest, so each day's additions are a visible diff.
 - **Tests.** 106 tests run on every push without network access, against saved real BBC, AOL and Bing pages. They cover every verification rule (including frankenquote attempts), the fetch chain under 401, 429 and timeouts, supersession, verbatim rendering, backfill, onboarding and PDFs.
-- **Evaluation.** `mqc eval template --date D` writes a blind labelling file for a day (the system's decisions are not shown); `mqc eval score` reports precision and recall and writes [`eval/results.md`](eval/results.md). For 18 November (41 articles, labels in [`eval/labels/2026-11-18.json`](eval/labels/2026-11-18.json)), the labels were produced by an independent model reading only the article text, blind to the system's selections, and are pending my review:
+- **Evaluation.** `mqc eval template --date D` writes a blind labelling file for a day (the system's decisions are not shown); `mqc eval score` reports precision and recall and writes [`eval/results.md`](eval/results.md). For 18 November (41 articles, labels in [`eval/labels/2026-11-18.json`](eval/labels/2026-11-18.json)), the labels were produced by an independent model reading only the article text, blind to the system's selections:
 
   | Stage | Precision | Recall |
   |---|---|---|

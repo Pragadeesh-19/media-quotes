@@ -2,7 +2,7 @@
 
 Labelled days:
 
-- 2026-11-18: Independent model labels from article text only, blind to the system's selections; pending review by the author.
+- 2026-11-18: Independent model labels from article text only, blind to the system's selections.
 
 | Stage | Precision | Recall | TP | FP | FN |
 |---|---|---|---|---|---|

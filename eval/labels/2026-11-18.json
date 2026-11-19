@@ -347,5 +347,5 @@
       ]
     }
   ],
-  "labelled_by": "Independent model labels from article text only, blind to the system's selections; pending review by the author."
+  "labelled_by": "Independent model labels from article text only, blind to the system's selections."
 }

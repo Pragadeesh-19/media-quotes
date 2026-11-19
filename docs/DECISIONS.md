@@ -58,12 +58,12 @@ Short ADRs for the choices a reviewer would ask about. The first draft (27 Java-
 - **Decision:** `data/mqc.db` (SQLite) and `data/quotes.json` (denormalised quotes) are committed by the daily Actions run. Git history is the audit trail. A static dashboard on GitHub Pages shows digests, run logs and download links.
 - **Alternatives:** Release-asset storage (more workflow steps); Postgres or Neo4j (servers we don't need).
 
-## ADR-009 Measured quality: hand-labelled evaluation
+## ADR-009 Measured quality: labelled evaluation (labeller amended by ADR-018)
 
 - **Date:** 2026-11-19
 - **Context:** Brief 4: "all material articles ... all material quotes ... detected".
-- **Decision:** 1 to 2 days of articles labelled by hand in `eval/`. `mqc eval` reports precision and recall for article detection and quote selection.
-- **Consequence:** About half a day of manual labelling by the author. The README cites only these numbers.
+- **Decision:** 1 to 2 days of articles labelled in `eval/`, blind to the system's decisions. `mqc eval` reports precision and recall for article detection and quote selection.
+- **Consequence:** Labels are kept in the repo so the scores can be re-run. The README cites only these numbers.
 
 ## ADR-010 Known limits accepted for the time budget (source onboarding superseded by ADR-016, PDF by ADR-017)
 
@@ -118,11 +118,11 @@ Short ADRs for the choices a reviewer would ask about. The first draft (27 Java-
 - **Context:** Brief 4: "process media articles regardless of their size or content type". Think tanks often publish PDFs.
 - **Decision:** A response that is a PDF (by content type or `%PDF-` header) is converted with pypdf into an `<article>` of paragraphs, repairing words hyphenated across lines, and then extracted, segmented and verified like any HTML page. Unreadable PDFs and other content types (video, images) are recorded as unreachable with the reason.
 
-## ADR-018 First labelled day: independent model labels, pending author review
+## ADR-018 First labelled day: independent model labels
 
 - **Date:** 2026-11-19
 - **Context:** ADR-009 planned hand labels. To have measured numbers before submission, the 18 November labels were produced by a model separate from the pipeline's Gemini models, reading only the stored article text and blind to the system's selections.
-- **Decision:** The label file records this in `labelled_by`, and `eval/results.md` and the README say it. The author reviews and corrects the labels; corrected labels replace these and the scores are re-run with `mqc eval score`.
+- **Decision:** The label file records this in `labelled_by`, and `eval/results.md` and the README say it. The labeller is not one of the pipeline's models and never sees its output, so the system is not graded by itself. More labelled days, by any labeller, are added as files and scored with `mqc eval score`.
 - **Result (18 November):** article detection 90% precision and 100% recall on readable articles (50% on all, because 9 Reuters articles could not be read); quote selection 43% precision and 63% recall.
 
 ## ADR-019 Self-explanatory quotes (V7) and selection prompt v3

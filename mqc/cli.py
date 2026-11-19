@@ -63,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
                             help="collect this outlet's quotes from this date until today")
     add_source.add_argument("--max-llm-calls", type=int)
 
-    evaluation = sub.add_parser("eval", help="hand-labelled evaluation")
+    evaluation = sub.add_parser("eval", help="labelled evaluation")
     eval_sub = evaluation.add_subparsers(dest="eval_command", required=True)
     template = eval_sub.add_parser("template", help="write a blank labelling file for one day")
     template.add_argument("--date", type=date.fromisoformat, required=True)
