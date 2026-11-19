@@ -1,0 +1,38 @@
+{
+  "source_id": "reuters",
+  "name": "Reuters",
+  "publication_name": "Reuters",
+  "domains": [
+    "www.reuters.com"
+  ],
+  "channels": [
+    {
+      "type": "bing_news",
+      "query": "site:reuters.com ukraine"
+    },
+    {
+      "type": "bing_news",
+      "query": "site:reuters.com russia war"
+    },
+    {
+      "type": "bing_news",
+      "query": "site:reuters.com kremlin"
+    }
+  ],
+  "fetch_methods": [
+    "direct",
+    "wayback",
+    "syndication"
+  ],
+  "body_selector": "[data-testid^='paragraph-']",
+  "url_path_strip": "^/[0-9a-f]{12}(?=/)",
+  "exclude_url_patterns": [
+    "/video/",
+    "/pictures/",
+    "/graphics/"
+  ],
+  "syndication_partners": {
+    "www.aol.com": "div.content-body",
+    "uk.news.yahoo.com": null
+  }
+}

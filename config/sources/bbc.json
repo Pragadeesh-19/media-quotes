@@ -1,0 +1,14 @@
+{
+  "source_id": "bbc",
+  "name": "BBC",
+  "publication_name": "BBC News",
+  "domains": ["www.bbc.co.uk", "www.bbc.com"],
+  "channels": [
+    {"type": "rss", "url": "https://feeds.bbci.co.uk/news/world/europe/rss.xml"},
+    {"type": "rss", "url": "https://feeds.bbci.co.uk/news/world/rss.xml"},
+    {"type": "rss", "url": "https://feeds.bbci.co.uk/news/rss.xml"}
+  ],
+  "fetch_methods": ["direct", "wayback"],
+  "body_selector": "[data-testid='rich-text']",
+  "exclude_url_patterns": ["/sport/", "/live/", "/videos/", "/sounds/", "/iplayer/"]
+}
