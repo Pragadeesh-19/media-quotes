@@ -1,0 +1,18 @@
+{
+  "version": "war-v1",
+  "anchor_terms": [
+    "ukraine", "ukraine's", "ukrainian", "ukrainians", "kyiv", "kiev", "zelensky", "zelenskiy", "zelenskyy",
+    "donbas", "donbass", "donetsk", "luhansk", "zaporizhzhia", "kharkiv", "kherson", "crimea", "crimean",
+    "odesa", "odessa", "pokrovsk", "kupiansk", "kostiantynivka", "huliaipole", "sumy", "chernihiv"
+  ],
+  "context_terms": [
+    "russia", "russia's", "russian", "russians", "kremlin", "putin", "moscow", "peskov", "lavrov", "shoigu",
+    "belousov", "gerasimov", "witkoff", "kushner", "ceasefire", "peace talks", "peace plan", "front line",
+    "frontline", "invasion", "nato", "sanctions", "drone", "drones", "missile", "missiles", "black sea",
+    "kursk", "belgorod", "mobilisation", "mobilization", "air defence", "air defense", "war"
+  ],
+  "field_weights": {"title": 3.0, "summary": 2.0, "url": 2.0, "body": 1.0},
+  "anchor_weight": 3.0,
+  "context_weight": 1.0,
+  "min_body_anchor_density": 2.0
+}
