@@ -8,7 +8,7 @@ from mqc.config import LlmSettings
 from mqc.net import Http, HttpFailure
 
 _FENCE = re.compile(r"^```(?:json)?\s*|\s*```$")
-_CAPACITY_ERRORS = ("HTTP 429", "HTTP 500", "HTTP 502", "HTTP 503", "HTTP 504", "ReadTimeout")
+_CAPACITY_ERRORS = ("HTTP 429", "HTTP 500", "HTTP 502", "HTTP 503", "HTTP 504")
 
 
 class LlmError(Exception):

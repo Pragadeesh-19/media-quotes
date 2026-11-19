@@ -68,3 +68,20 @@ def test_missing_key_is_unavailable(tmp_path):
 
 def test_fenced_json_is_parsed():
     assert parse_json_content('```json\n{"a": 1}\n```') == {"a": 1}
+
+
+def test_timeout_fails_this_request_but_keeps_the_model(tmp_path):
+    attempts = []
+
+    def handler(request):
+        attempts.append(1)
+        if len(attempts) == 1:
+            raise httpx.ReadTimeout("slow")
+        return _reply('{"ok": 1}')
+
+    client = _client(tmp_path, handler)
+    with pytest.raises(LlmError) as error:
+        client.complete_json("s", "long article")
+    assert not isinstance(error.value, LlmUnavailable)
+    assert client.complete_json("s", "next article") == {"ok": 1}
+    assert client.unavailable_models == {}
