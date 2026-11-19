@@ -9,6 +9,8 @@ from mqc.net import Http, HttpFailure
 
 _FENCE = re.compile(r"^```(?:json)?\s*|\s*```$")
 _CAPACITY_ERRORS = ("HTTP 429", "HTTP 500", "HTTP 502", "HTTP 503", "HTTP 504")
+_TIMEOUT_ERRORS = ("ReadTimeout", "WriteTimeout", "ConnectTimeout", "PoolTimeout")
+MAX_CONSECUTIVE_TIMEOUTS = 2
 
 
 class LlmError(Exception):
@@ -28,7 +30,11 @@ class LlmClient(Protocol):
 
 
 class OpenAiCompatibleClient:
-    """Calls models in the configured order; a model that fails on capacity is skipped for the rest of the run."""
+    """Calls models in the configured order.
+
+    A model that fails on capacity (429/5xx), or times out on consecutive calls, is skipped for the rest of the run.
+    A single timeout fails only the current request.
+    """
 
     def __init__(self, settings: LlmSettings, http: Http, cache_dir: Path, max_calls: int | None = None):
         self.settings = settings
@@ -38,6 +44,7 @@ class OpenAiCompatibleClient:
         self.calls = 0
         self.cache_hits = 0
         self.unavailable_models: dict[str, str] = {}
+        self.consecutive_timeouts: dict[str, int] = {}
         self.last_model: str | None = None
 
     def complete_json(self, system: str, user: str) -> dict | list:
@@ -57,6 +64,11 @@ class OpenAiCompatibleClient:
                 return self._call(model, messages)
             except _CapacityError as error:
                 self.unavailable_models[model] = str(error)
+            except _TimeoutError as error:
+                self.consecutive_timeouts[model] = self.consecutive_timeouts.get(model, 0) + 1
+                if self.consecutive_timeouts[model] < MAX_CONSECUTIVE_TIMEOUTS:
+                    raise LlmError(str(error)) from error
+                self.unavailable_models[model] = f"{MAX_CONSECUTIVE_TIMEOUTS} consecutive timeouts: {error}"
         raise LlmUnavailable(f"no model available: {self.unavailable_models}")
 
     def _call(self, model: str, messages: list[dict]) -> dict | list:
@@ -71,9 +83,12 @@ class OpenAiCompatibleClient:
         except HttpFailure as error:
             if any(marker in str(error) for marker in _CAPACITY_ERRORS):
                 raise _CapacityError(str(error)) from error
+            if any(marker in str(error) for marker in _TIMEOUT_ERRORS):
+                raise _TimeoutError(str(error)) from error
             raise LlmError(str(error)) from error
         if response.status_code != 200:
             raise LlmError(f"{model} HTTP {response.status_code}: {response.text[:300]}")
+        self.consecutive_timeouts[model] = 0
         content = response.json()["choices"][0]["message"]["content"]
         parsed = parse_json_content(content)
         cached = self._cache_path(model, messages)
@@ -89,6 +104,10 @@ class OpenAiCompatibleClient:
 
 
 class _CapacityError(Exception):
+    pass
+
+
+class _TimeoutError(Exception):
     pass
 
 

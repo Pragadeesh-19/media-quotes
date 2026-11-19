@@ -96,3 +96,41 @@ def test_bare_list_is_accepted_where_an_object_was_asked():
 def test_scalar_json_is_rejected():
     with pytest.raises(LlmError, match="neither an object nor a list"):
         parse_json_content("42")
+
+
+def test_model_that_keeps_timing_out_is_dropped_for_the_run(tmp_path):
+    seen = []
+
+    def handler(request):
+        model = json.loads(request.content)["model"]
+        seen.append(model)
+        if model == "big":
+            raise httpx.ReadTimeout("hung")
+        return _reply('{"ok": 1}')
+
+    client = _client(tmp_path, handler)
+    with pytest.raises(LlmError):
+        client.complete_json("s", "article 1")
+    assert client.complete_json("s", "article 2") == {"ok": 1}
+    assert client.complete_json("s", "article 3") == {"ok": 1}
+    assert seen == ["big", "big", "lite", "lite"]
+    assert "consecutive timeouts" in client.unavailable_models["big"]
+
+
+def test_success_resets_the_timeout_count(tmp_path):
+    answers = iter([httpx.ReadTimeout("slow"), _reply('{"a": 1}'), httpx.ReadTimeout("slow"), _reply('{"b": 1}')])
+
+    def handler(request):
+        answer = next(answers)
+        if isinstance(answer, Exception):
+            raise answer
+        return answer
+
+    client = _client(tmp_path, handler)
+    with pytest.raises(LlmError):
+        client.complete_json("s", "1")
+    client.complete_json("s", "2")
+    with pytest.raises(LlmError):
+        client.complete_json("s", "3")
+    assert client.complete_json("s", "4") == {"b": 1}
+    assert client.unavailable_models == {}
