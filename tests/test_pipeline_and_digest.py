@@ -234,11 +234,11 @@ def _quote(start: str, topic: str = "war-intensity/crimean-bridge/attacks") -> d
             "section": "War Intensity & Battlefield", "topic_key": topic, "claim_type": "state"}
 
 
-def test_selection_is_capped_at_five_quotes_per_article(ctx):
-    ctx.llm.selection = {"quotes": [_quote(f"b{i}.s0") for i in (0, 1, 2, 3, 5, 6, 7)]}
+def test_selection_is_capped_at_eight_quotes_per_article(ctx):
+    ctx.llm.selection = {"quotes": [_quote(f"b{i}.s0") for i in (0, 1, 2, 3, 5, 6, 7, 11, 12, 13)]}
     discover_all(ctx, ["bbc"])
     process_queue(ctx, ["bbc"])
-    assert ctx.store.conn.execute("SELECT COUNT(*) FROM quotes").fetchone()[0] == 5
+    assert ctx.store.conn.execute("SELECT COUNT(*) FROM quotes").fetchone()[0] == 8
     events = [json.loads(l) for l in ctx.log.path.read_text(encoding="utf-8").splitlines()]
     assert next(e for e in events if e["event"] == "quotes")["dropped_over_cap"] == 2
 
