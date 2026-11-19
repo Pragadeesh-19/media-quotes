@@ -1,9 +1,10 @@
 from collections import Counter
 from dataclasses import dataclass, field
-from datetime import timedelta
+from datetime import date, timedelta
 
 from mqc.config import SourceConfig
-from mqc.discovery import discover
+from mqc.discovery import DiscoveryReport, discover, discover_period
+from mqc.extract import canonical_url
 from mqc.extract import ExtractionError, extract_article
 from mqc.fetch import FetchRequest, Unreachable, fetch_article
 from mqc.llm import LlmClient, LlmError, LlmUnavailable
@@ -35,15 +36,35 @@ def discover_all(ctx: Context, source_ids: list[str]) -> None:
     for source_id in source_ids:
         config = ctx.sources[source_id]
         ctx.store.upsert_source(config)
-        report = discover(config, ctx.http)
-        new = sum(ctx.store.add_candidate(c, config) for c in report.candidates)
-        ctx.stats[f"{source_id}.discovered_new"] += new
-        ctx.log.event("info", "discovery", source_id=source_id, per_channel=report.per_channel,
-                      errors=report.errors, candidates=len(report.candidates), new=new)
-        for channel, count in report.per_channel.items():
-            if count == 0:
-                ctx.log.event("warning", "channel_empty", source_id=source_id, channel=channel,
-                              error=report.errors.get(channel))
+        _record_discovery(ctx, config, discover(config, ctx.http), prefilter=False)
+
+
+def discover_backfill(ctx: Context, source_ids: list[str], start: date, end: date) -> None:
+    for source_id in source_ids:
+        config = ctx.sources[source_id]
+        ctx.store.upsert_source(config)
+        _record_discovery(ctx, config, discover_period(config, ctx.http, start, end), prefilter=True)
+
+
+def _record_discovery(ctx: Context, config: SourceConfig, report: DiscoveryReport, prefilter: bool) -> None:
+    source_id = config.source_id
+    new = 0
+    for candidate in report.candidates:
+        if not ctx.store.add_candidate(candidate, config):
+            continue
+        new += 1
+        if prefilter:
+            verdict = ctx.relevance.prefilter(candidate.title, candidate.summary, candidate.url)
+            if not verdict.relevant:
+                ctx.store.skip_candidate(canonical_url(candidate.url, config), verdict)
+                ctx.stats[f"{source_id}.prefiltered_out"] += 1
+    ctx.stats[f"{source_id}.discovered_new"] += new
+    ctx.log.event("info", "discovery", source_id=source_id, per_channel=report.per_channel,
+                  errors=report.errors, candidates=len(report.candidates), new=new)
+    for channel, count in report.per_channel.items():
+        if count == 0:
+            ctx.log.event("warning", "channel_empty", source_id=source_id, channel=channel,
+                          error=report.errors.get(channel))
 
 
 def process_queue(ctx: Context, source_ids: list[str]) -> None:

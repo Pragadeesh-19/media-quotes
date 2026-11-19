@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass, field
-from datetime import UTC
+from datetime import UTC, date, datetime, time, timedelta
 from email.utils import parsedate_to_datetime
 from urllib.parse import parse_qs, quote_plus, urlsplit
 
@@ -12,6 +12,8 @@ from mqc.models import Candidate
 from mqc.net import Http, HttpFailure
 
 BING_NEWS_RSS = "https://www.bing.com/news/search?q={query}&format=rss&count=100"
+WAYBACK_CDX = "https://web.archive.org/cdx/search/cdx"
+WAYBACK_RAW = "https://web.archive.org/web/{timestamp}id_/{url}"
 
 
 @dataclass
@@ -22,12 +24,31 @@ class DiscoveryReport:
 
 
 def discover(config: SourceConfig, http: Http) -> DiscoveryReport:
+    return _collect(config, config.channels, lambda channel: _fetch_channel(channel, config, http))
+
+
+def discover_period(config: SourceConfig, http: Http, start: date, end: date) -> DiscoveryReport:
+    """Candidates published between start and end (inclusive), from history channels and current channels."""
+    first = datetime.combine(start, time.min, tzinfo=UTC)
+    last = datetime.combine(end, time.max, tzinfo=UTC)
+
+    def fetch(channel: Channel) -> list[Candidate]:
+        if channel.type == "wayback_feed":
+            found = _archived_feed(channel, config, http, start, end)
+        else:
+            found = _fetch_channel(channel, config, http)
+        return [c for c in found if c.published_at and first <= c.published_at <= last]
+
+    return _collect(config, [*config.history_channels, *config.channels], fetch)
+
+
+def _collect(config: SourceConfig, channels: list[Channel], fetch) -> DiscoveryReport:
     report = DiscoveryReport()
     seen: set[str] = set()
-    for channel in config.channels:
+    for channel in channels:
         label = f"{channel.type}:{channel.url or channel.query}"
         try:
-            found = _fetch_channel(channel, config, http)
+            found = fetch(channel)
         except HttpFailure as error:
             report.errors[label] = str(error)
             report.per_channel[label] = 0
@@ -59,6 +80,21 @@ def _fetch_channel(channel: Channel, config: SourceConfig, http: Http) -> list[C
     if response.status_code >= 400:
         raise HttpFailure(f"GET {url} returned HTTP {response.status_code}")
     return parse_rss(response.text, config.source_id, channel.type)
+
+
+def _archived_feed(channel: Channel, config: SourceConfig, http: Http, start: date, end: date) -> list[Candidate]:
+    response = http.get(WAYBACK_CDX, params={"url": channel.url, "from": f"{start:%Y%m%d}",
+                                             "to": f"{end + timedelta(days=2):%Y%m%d}",
+                                             "filter": "statuscode:200", "fl": "timestamp",
+                                             "collapse": "timestamp:8"})
+    if response.status_code != 200:
+        raise HttpFailure(f"archive index for {channel.url} returned HTTP {response.status_code}")
+    candidates = []
+    for timestamp in response.text.split():
+        snapshot = http.get(WAYBACK_RAW.format(timestamp=timestamp, url=channel.url))
+        if snapshot.status_code == 200:
+            candidates += parse_rss(snapshot.text, config.source_id, "wayback_feed")
+    return candidates
 
 
 def parse_rss(xml: str, source_id: str, channel: str) -> list[Candidate]:

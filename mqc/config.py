@@ -26,6 +26,7 @@ class SourceConfig(BaseModel):
     url_path_strip: str | None = None
     exclude_url_patterns: list[str] = []
     syndication_partners: dict[str, str | None] = {}
+    history_channels: list[Channel] = []
 
 
 class LlmSettings(BaseModel):

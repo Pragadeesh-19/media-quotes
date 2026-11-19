@@ -57,6 +57,15 @@ class RelevanceFilter:
             relevant, reason = False, f"no headline anchor; body anchor density {density:.1f}/1000 words"
         return Verdict(relevant, round(score, 2), reason, dict(sorted(matched.items())), self.version)
 
+    def prefilter(self, title: str, summary: str, url: str) -> Verdict:
+        """Cheap pre-fetch check used for backfill: keep any candidate whose title, summary or URL has a war term."""
+        fields = f"{title} {summary} {_URL_SEPARATORS.sub(' ', url)}"
+        matched = Counter(term for term, _, _ in self._matches(fields))
+        if matched:
+            return Verdict(True, float(sum(matched.values())), "prefilter: war term in title, summary or url",
+                           dict(sorted(matched.items())), self.version)
+        return Verdict(False, 0.0, "prefilter: no war term in title, summary or url", {}, self.version)
+
     def _matches(self, text: str):
         lowered = text.lower()
         for end, (term, is_anchor, weight) in self._automaton.iter(lowered):

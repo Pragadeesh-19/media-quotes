@@ -7,7 +7,7 @@ from mqc.config import ROOT, llm_settings, load_lexicon, load_sources
 from mqc.digest import build_digest
 from mqc.llm import OpenAiCompatibleClient
 from mqc.net import Http
-from mqc.pipeline import Context, discover_all, process_queue
+from mqc.pipeline import Context, discover_all, discover_backfill, process_queue
 from mqc.relevance import RelevanceFilter
 from mqc.runlog import RunLog, new_run_id
 from mqc.store import Store
@@ -27,6 +27,12 @@ def main(argv: list[str] | None = None) -> int:
     daily.add_argument("--date", type=date.fromisoformat, default=datetime.now(UTC).date())
     daily.add_argument("--source", action="append", help="limit to a source id (repeatable)")
     daily.add_argument("--max-llm-calls", type=int)
+
+    backfill = sub.add_parser("backfill", help="collect quotes for a past period")
+    backfill.add_argument("--start", type=date.fromisoformat, required=True)
+    backfill.add_argument("--end", type=date.fromisoformat, required=True)
+    backfill.add_argument("--source", action="append", help="limit to a source id (repeatable)")
+    backfill.add_argument("--max-llm-calls", type=int)
 
     digest = sub.add_parser("digest", help="rebuild the digest for one day from the database")
     digest.add_argument("--date", type=date.fromisoformat, default=datetime.now(UTC).date())
@@ -95,6 +101,18 @@ def cmd_daily(args) -> int:
     return _run(args, "daily", body)
 
 
+def cmd_backfill(args) -> int:
+    if args.end < args.start:
+        raise SystemExit("--end must not be before --start")
+
+    def body(ctx: Context) -> None:
+        source_ids = args.source or sorted(ctx.sources)
+        ctx.log.event("info", "backfill_period", start=args.start.isoformat(), end=args.end.isoformat())
+        discover_backfill(ctx, source_ids, args.start, args.end)
+        process_queue(ctx, source_ids)
+    return _run(args, "backfill", body)
+
+
 def cmd_digest(args) -> int:
     return _run(args, "digest", lambda ctx: _write_digest(ctx, args.date))
 
@@ -107,7 +125,7 @@ def cmd_export(_args) -> int:
     return 0
 
 
-COMMANDS = {"daily": cmd_daily, "digest": cmd_digest, "export": cmd_export}
+COMMANDS = {"daily": cmd_daily, "backfill": cmd_backfill, "digest": cmd_digest, "export": cmd_export}
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -34,5 +34,39 @@
   "syndication_partners": {
     "www.aol.com": "div.content-body",
     "uk.news.yahoo.com": null
-  }
+  },
+  "history_channels": [
+    {
+      "type": "bing_news",
+      "query": "site:reuters.com zelenskiy"
+    },
+    {
+      "type": "bing_news",
+      "query": "site:reuters.com kyiv"
+    },
+    {
+      "type": "bing_news",
+      "query": "site:reuters.com crimea"
+    },
+    {
+      "type": "bing_news",
+      "query": "site:reuters.com russian sanctions"
+    },
+    {
+      "type": "bing_news",
+      "query": "site:reuters.com putin ukraine"
+    },
+    {
+      "type": "bing_news",
+      "query": "site:reuters.com ukraine peace talks"
+    },
+    {
+      "type": "bing_news",
+      "query": "site:reuters.com russian forces"
+    },
+    {
+      "type": "bing_news",
+      "query": "site:reuters.com drone attack ukraine"
+    }
+  ]
 }

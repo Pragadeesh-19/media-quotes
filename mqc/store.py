@@ -114,6 +114,14 @@ class Store:
                  "feed" if published else None, candidate.channel, ArticleStatus.DISCOVERED, now_iso()))
         return cursor.rowcount == 1
 
+    def skip_candidate(self, url: str, verdict: Verdict) -> None:
+        with self.conn:
+            self.conn.execute(
+                "UPDATE articles SET status = ?, reason = ?, relevance_score = ?, relevance_terms = ?, "
+                "filter_version = ? WHERE url = ? AND status = ?",
+                (ArticleStatus.IRRELEVANT, verdict.reason, verdict.score, json.dumps(verdict.matched),
+                 verdict.filter_version, url, ArticleStatus.DISCOVERED))
+
     def work_queue(self, source_id: str | None = None) -> list[sqlite3.Row]:
         placeholders = ",".join("?" * len(WORK_STATUSES))
         sql = f"SELECT * FROM articles WHERE status IN ({placeholders}) AND attempts < ?"
