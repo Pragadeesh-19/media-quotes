@@ -11,6 +11,7 @@ from mqc.net import Http
 from mqc.pipeline import Context, discover_all, discover_backfill, process_queue
 from mqc.relevance import RelevanceFilter
 from mqc.runlog import RunLog, new_run_id
+from mqc.site import build_site
 from mqc.store import Store
 
 DB_PATH = ROOT / "data" / "mqc.db"
@@ -20,6 +21,7 @@ LOG_DIR = ROOT / "logs"
 LLM_CACHE_DIR = ROOT / ".cache" / "llm"
 LABEL_DIR = ROOT / "eval" / "labels"
 EVAL_REPORT = ROOT / "eval" / "results.md"
+SITE_DIR = ROOT / "site"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -42,6 +44,8 @@ def main(argv: list[str] | None = None) -> int:
     digest.add_argument("--max-llm-calls", type=int)
 
     sub.add_parser("export", help="write data/quotes.json from the database")
+
+    sub.add_parser("site", help="generate the static dashboard into site/")
 
     evaluation = sub.add_parser("eval", help="hand-labelled evaluation")
     eval_sub = evaluation.add_subparsers(dest="eval_command", required=True)
@@ -134,6 +138,16 @@ def cmd_export(_args) -> int:
     return 0
 
 
+def cmd_site(_args) -> int:
+    store = Store(DB_PATH)
+    try:
+        build_site(store, ROOT, SITE_DIR)
+    finally:
+        store.close()
+    print(f"dashboard written to {SITE_DIR.relative_to(ROOT)}/index.html")
+    return 0
+
+
 def cmd_eval(args) -> int:
     store = Store(DB_PATH)
     try:
@@ -152,7 +166,7 @@ def cmd_eval(args) -> int:
     return 0
 
 
-COMMANDS = {"daily": cmd_daily, "backfill": cmd_backfill, "digest": cmd_digest, "export": cmd_export, "eval": cmd_eval}
+COMMANDS = {"daily": cmd_daily, "backfill": cmd_backfill, "digest": cmd_digest, "export": cmd_export, "eval": cmd_eval, "site": cmd_site}
 
 if __name__ == "__main__":
     sys.exit(main())
