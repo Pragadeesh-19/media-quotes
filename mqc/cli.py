@@ -8,6 +8,7 @@ from mqc.digest import build_digest
 from mqc.evaluate import render_report, score_labels, write_template
 from mqc.llm import OpenAiCompatibleClient
 from mqc.net import Http
+from mqc.onboard import OnboardingError, profile_source
 from mqc.pipeline import Context, discover_all, discover_backfill, process_queue
 from mqc.relevance import RelevanceFilter
 from mqc.runlog import RunLog, new_run_id
@@ -22,6 +23,7 @@ LLM_CACHE_DIR = ROOT / ".cache" / "llm"
 LABEL_DIR = ROOT / "eval" / "labels"
 EVAL_REPORT = ROOT / "eval" / "results.md"
 SITE_DIR = ROOT / "site"
+SOURCES_DIR = ROOT / "config" / "sources"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -46,6 +48,14 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("export", help="write data/quotes.json from the database")
 
     sub.add_parser("site", help="generate the static dashboard into site/")
+
+    add_source = sub.add_parser("add-source", help="build a pipeline for a new outlet from its homepage")
+    add_source.add_argument("homepage")
+    add_source.add_argument("--id", dest="source_id")
+    add_source.add_argument("--name")
+    add_source.add_argument("--backfill-from", type=date.fromisoformat,
+                            help="collect this outlet's quotes from this date until today")
+    add_source.add_argument("--max-llm-calls", type=int)
 
     evaluation = sub.add_parser("eval", help="hand-labelled evaluation")
     eval_sub = evaluation.add_subparsers(dest="eval_command", required=True)
@@ -138,6 +148,24 @@ def cmd_export(_args) -> int:
     return 0
 
 
+def cmd_add_source(args) -> int:
+    try:
+        onboarding = profile_source(args.homepage, Http(), args.source_id, args.name)
+    except OnboardingError as error:
+        raise SystemExit(f"cannot add source: {error}")
+    config = onboarding.config
+    path = SOURCES_DIR / f"{config.source_id}.json"
+    if path.exists():
+        raise SystemExit(f"{path.relative_to(ROOT)} already exists")
+    path.write_text(f"{config.model_dump_json(indent=2)}\n", encoding="utf-8")
+    print(f"wrote {path.relative_to(ROOT)}: {len(config.channels)} feed(s), domains {', '.join(config.domains)}")
+    print(f"sample article: {onboarding.sample.title!r} ({onboarding.sample_blocks} body paragraphs)")
+    if args.backfill_from:
+        args.start, args.end, args.source = args.backfill_from, datetime.now(UTC).date(), [config.source_id]
+        return cmd_backfill(args)
+    return 0
+
+
 def cmd_site(_args) -> int:
     store = Store(DB_PATH)
     try:
@@ -166,7 +194,7 @@ def cmd_eval(args) -> int:
     return 0
 
 
-COMMANDS = {"daily": cmd_daily, "backfill": cmd_backfill, "digest": cmd_digest, "export": cmd_export, "eval": cmd_eval, "site": cmd_site}
+COMMANDS = {"daily": cmd_daily, "backfill": cmd_backfill, "digest": cmd_digest, "export": cmd_export, "eval": cmd_eval, "site": cmd_site, "add-source": cmd_add_source}
 
 if __name__ == "__main__":
     sys.exit(main())
