@@ -10,6 +10,8 @@ MAX_SENTENCES = 5
 MAX_BLOCKS = 2
 QUOTABLE_BLOCKS = {BlockType.PARAGRAPH, BlockType.BLOCKQUOTE, BlockType.LIST_ITEM}
 SPEAKER_LOOKBACK_BLOCKS = 2
+UNRESOLVED_OPENERS = {"he", "she", "they", "it", "this", "these", "those", "that", "his", "her", "their", "its"}
+_FIRST_WORD = re.compile(r"[A-Za-z']+")
 _CONTAMINATION = re.compile(
     r"(advertisement|read more|sign up|getty images|image source|image caption|"
     r"page \d+ of \d+|\|\s*\||click here|subscribe)",
@@ -40,6 +42,12 @@ def slice_text(article: Article, start_sid: str, end_sid: str) -> str:
 
 
 def build_quote(proposal: SpanProposal, article: Article, config: SourceConfig) -> Quote | Rejection:
+    rejection = _v1_span(proposal, article, config)
+    if rejection:
+        return rejection
+    proposal = resolve_opening(proposal, article)
+    if isinstance(proposal, Rejection):
+        return proposal
     for rule in (_v1_span, _v4_block_types, _v5_metadata, _v6_source):
         rejection = rule(proposal, article, config)
         if rejection:
@@ -61,6 +69,33 @@ def build_quote(proposal: SpanProposal, article: Article, config: SourceConfig) 
         topic_key=normalize_topic_key(proposal.topic_key),
         claim_type=proposal.claim_type,
     )
+
+
+def resolve_opening(proposal: SpanProposal, article: Article) -> SpanProposal | Rejection:
+    """V7: a quote must not open with a pronoun whose referent is outside it.
+
+    The span is extended back by one sentence; if it still opens with such a pronoun, or the extension would
+    break the V1 size limits, the quote is rejected.
+    """
+    if not _opens_unresolved(article, proposal.start):
+        return proposal
+    order = _ordered_sids(article)
+    position = order.index(proposal.start)
+    if position == 0:
+        return Rejection("V7", "opens with an unresolved pronoun at the start of the article")
+    extended = proposal.model_copy(update={"start": order[position - 1]})
+    if _v1_span(extended, article, None) or _opens_unresolved(article, extended.start):
+        return Rejection("V7", "opens with an unresolved pronoun and one sentence of context does not resolve it")
+    return extended
+
+
+def _opens_unresolved(article: Article, sid: str) -> bool:
+    block, sentence = article.sentence_index()[sid]
+    opening = block.text[sentence.start:sentence.end]
+    if opening[:1] in "\"“'‘":
+        return False
+    word = _FIRST_WORD.match(opening)
+    return bool(word) and word.group(0).lower() in UNRESOLVED_OPENERS
 
 
 def unverified_speaker(proposal: SpanProposal, article: Article) -> Rejection | None:

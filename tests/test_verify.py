@@ -62,7 +62,7 @@ def test_span_that_starts_inside_a_quotation_is_rejected(sources):
 
 
 def test_span_with_unclosed_quotation_is_rejected(sources):
-    article = make_article(["He said: “The front is stable. Reserves have arrived."])
+    article = make_article(["Syrskyi said: “The front is stable. Reserves have arrived."])
     assert build_quote(_proposal("b0.s0", "b0.s0"), article, sources["bbc"]).rule == "V3"
 
 
@@ -112,3 +112,39 @@ def test_stored_quote_that_no_longer_matches_article_fails(sources):
 
 def test_slice_text_of_whole_block_equals_block():
     assert slice_text(ARTICLE, "b2.s0", "b2.s1") == ARTICLE.blocks[2].text
+
+
+def test_pronoun_opening_extends_back_one_sentence(sources):
+    article = make_article(["Oleksandr Syrskyi visited the front. He said reserves had arrived."])
+    quote = build_quote(_proposal("b0.s1", "b0.s1"), article, sources["bbc"])
+    assert isinstance(quote, Quote)
+    assert quote.text == "Oleksandr Syrskyi visited the front. He said reserves had arrived."
+    assert quote.start_sid == "b0.s0"
+
+
+def test_pronoun_opening_extends_into_the_previous_paragraph(sources):
+    article = make_article(["The EU agreed a new sanctions package.", "It targets shadow fleet tankers."])
+    quote = build_quote(_proposal("b1.s0", "b1.s0"), article, sources["bbc"])
+    assert quote.text == "The EU agreed a new sanctions package.\n\nIt targets shadow fleet tankers."
+
+
+def test_pronoun_opening_at_article_start_is_rejected(sources):
+    article = make_article(["It was a quiet night on the front."])
+    assert build_quote(_proposal("b0.s0", "b0.s0"), article, sources["bbc"]).rule == "V7"
+
+
+def test_two_unresolved_openings_in_a_row_are_rejected(sources):
+    article = make_article(["Kyiv was hit. This was expected. It caused outages."])
+    assert build_quote(_proposal("b0.s2", "b0.s2"), article, sources["bbc"]).rule == "V7"
+
+
+def test_extension_that_breaks_the_size_limit_is_rejected(sources):
+    article = make_article(["Officials met in Berlin.", "They agreed on air defence.", "Talks end on Friday."])
+    assert build_quote(_proposal("b1.s0", "b2.s0"), article, sources["bbc"]) == Rejection(
+        "V7", "opens with an unresolved pronoun and one sentence of context does not resolve it")
+
+
+def test_direct_quotation_opening_is_not_a_pronoun_problem(sources):
+    article = make_article(["“They will not pass,” said Oleksandr Syrskyi."])
+    assert isinstance(build_quote(_proposal("b0.s0", "b0.s0", speaker="Oleksandr Syrskyi"), article,
+                                  sources["bbc"]), Quote)

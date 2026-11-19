@@ -9,7 +9,7 @@ from mqc.verify import build_quote
 from tests.conftest import make_article
 
 ARTICLE = make_article(["Russian forces advanced near Pokrovsk. The town is under heavy pressure.",
-                        "The EU agreed new sanctions. They target tankers."],
+                        "The EU agreed new sanctions. The measures target tankers."],
                        published=datetime(2026, 11, 18, 9, tzinfo=UTC))
 
 
