@@ -117,3 +117,10 @@ Short ADRs for the choices a reviewer would ask about. The first draft (27 Java-
 - **Date:** 2026-11-19
 - **Context:** Brief 4: "process media articles regardless of their size or content type". Think tanks often publish PDFs.
 - **Decision:** A response that is a PDF (by content type or `%PDF-` header) is converted with pypdf into an `<article>` of paragraphs, repairing words hyphenated across lines, and then extracted, segmented and verified like any HTML page. Unreadable PDFs and other content types (video, images) are recorded as unreachable with the reason.
+
+## ADR-018 First labelled day: independent model labels, pending author review
+
+- **Date:** 2026-11-19
+- **Context:** ADR-009 planned hand labels. To have measured numbers before submission, the 18 November labels were produced by a model separate from the pipeline's Gemini models, reading only the stored article text and blind to the system's selections.
+- **Decision:** The label file records this in `labelled_by`, and `eval/results.md` and the README say it. The author reviews and corrects the labels; corrected labels replace these and the scores are re-run with `mqc eval score`.
+- **Result (18 November):** article detection 90% precision and 100% recall on readable articles (50% on all, because 9 Reuters articles could not be read); quote selection 43% precision and 63% recall.
