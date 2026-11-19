@@ -124,3 +124,10 @@ Short ADRs for the choices a reviewer would ask about. The first draft (27 Java-
 - **Context:** ADR-009 planned hand labels. To have measured numbers before submission, the 18 November labels were produced by a model separate from the pipeline's Gemini models, reading only the stored article text and blind to the system's selections.
 - **Decision:** The label file records this in `labelled_by`, and `eval/results.md` and the README say it. The author reviews and corrects the labels; corrected labels replace these and the scores are re-run with `mqc eval score`.
 - **Result (18 November):** article detection 90% precision and 100% recall on readable articles (50% on all, because 9 Reuters articles could not be read); quote selection 43% precision and 63% recall.
+
+## ADR-019 Self-explanatory quotes (V7) and selection prompt v3
+
+- **Date:** 2026-11-19
+- **Context:** On the labelled day, quote selection had 43% precision, and 110 of 2,140 stored quotes opened with an unresolved pronoun, against the brief's "relevant, substantial, self-explanatory".
+- **Decision:** V7 extends a quote that opens with an unresolved pronoun back by one sentence, and rejects it if that does not resolve it or breaks V1's limits. Prompt v3 raises the materiality bar and asks for at most eight quotes per article, ordered by importance; code enforces the same cap. Quotes store their `prompt_version`, and `mqc reselect` re-runs selection for a period.
+- **Measured (18 Nov, same labels):** v1 43%/63% (F1 0.51); v2 with "at most 5" 62%/43% (F1 0.51); v3 58%/50% (F1 0.54). The code cap never fired; the number in the prompt drove the model's picks. One labelled day is too small to call the difference proven.

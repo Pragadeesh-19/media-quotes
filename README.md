@@ -106,8 +106,11 @@ The model receives numbered sentences and returns spans with labels: `{start: "b
 | V4 | Only quotable blocks (no headings); no ads, captions, page numbers or table pipes |
 | V5 | Title, link, outlet and publication date are present |
 | V6 | The link is on the source's own domain; a named speaker must appear verbatim in the quote or the two paragraphs before it |
+| V7 | The quote must not open with a pronoun (he, it, this...) whose referent is outside it. The span is extended back one sentence; if that does not resolve it, or breaks V1's limits, the quote is rejected |
 
 The live runs refined V6. Most rejections were valid quotes where the model wrote "Vladimir Putin" and the article said "Putin". The quote text was correct; only the attribution was unverifiable. Now the quote is kept with the speaker dropped, and the dropped name is logged. No unverified attribution reaches the database, and valid quotes are not lost.
+
+The evaluation added V7. "Self-explanatory" is in the brief, and 110 of the first 2,140 quotes opened with "He", "It" or "This". Rejecting them outright would lose material quotes, so V7 first tries the deterministic repair a human editor would make, including the previous sentence, and only rejects when that does not resolve the reference.
 
 ### What does "obsolete" mean?
 
@@ -132,16 +135,25 @@ Things failed constantly, and each failure became a rule:
 
 - **Every decision is logged.** `logs/<run_id>.jsonl` records each discovery, relevance verdict with matched terms, rejected quote with the rule that rejected it, dropped speaker, and supersession with its reason.
 - **Git history is an audit trail.** The daily job commits the database, the JSON export and the digest, so each day's additions are a visible diff.
-- **Tests.** 94 tests run on every push without network access, against saved real BBC, AOL and Bing pages. They cover every verification rule (including frankenquote attempts), the fetch chain under 401, 429 and timeouts, supersession, verbatim rendering, backfill, onboarding and PDFs.
+- **Tests.** 106 tests run on every push without network access, against saved real BBC, AOL and Bing pages. They cover every verification rule (including frankenquote attempts), the fetch chain under 401, 429 and timeouts, supersession, verbatim rendering, backfill, onboarding and PDFs.
 - **Evaluation.** `mqc eval template --date D` writes a blind labelling file for a day (the system's decisions are not shown); `mqc eval score` reports precision and recall and writes [`eval/results.md`](eval/results.md). For 18 November (41 articles, labels in [`eval/labels/2026-11-18.json`](eval/labels/2026-11-18.json)), the labels were produced by an independent model reading only the article text, blind to the system's selections, and are pending my review:
 
   | Stage | Precision | Recall |
   |---|---|---|
   | Article detection, all labelled articles | 90% (9/10) | 50% (9/18) |
   | Article detection, articles that could be read | 90% (9/10) | 100% (9/9) |
-  | Quote selection, processed articles (sentence overlap) | 43% (19/44) | 63% (19/30) |
 
-  What this says: the relevance filter missed no readable war article that day, and its one false positive was a fraud story with "Ukrainian" in the headline, the cost of favouring recall. All nine missed articles were Reuters articles that were found but could not be read, which is the access limit described above, not a detection failure. Quote selection over-selects: most quotes that day were chosen by the Lite fallback models, and fewer than half matched a labelled material quote. Tightening the selection prompt and measuring again against these labels is the next step.
+  The relevance filter missed no readable war article that day; its one false positive was a fraud story with "Ukrainian" in the headline, the cost of favouring recall. All nine missed articles were Reuters articles that were found but could not be read: the access limit described above, not a detection failure.
+
+  Quote selection was the weak stage, so I changed it and re-measured against the same labels (`mqc reselect` re-runs selection for processed articles and replaces their quotes; every quote records its `prompt_version`):
+
+  | Quote selection, 18 Nov (sentence overlap) | Precision | Recall | F1 |
+  |---|---|---|---|
+  | v1: original prompt | 43% (19/44) | 63% (19/30) | 0.51 |
+  | v2: stricter materiality bar, "at most 5", V7 | 62% (13/21) | 43% (13/30) | 0.51 |
+  | v3: stricter bar, "at most 8", V7 (current) | 58% (15/26) | 50% (15/30) | 0.54 |
+
+  What I learned: the stricter wording cut padding, and V7 removed every quote with a dangling pronoun (0 of 26 in v3). The cap of five did not cost recall through code (the code cap never fired); the number written in the prompt made the model pick three or four quotes per article. Telling it "at most 8" recovered part of the recall. These are 30 labelled quotes from one day, so the differences are a direction, not a proven improvement; more labelled days are what would settle it. Quotes collected before v3 are not re-selected yet (`mqc reselect --start 2026-10-01 --end <today>` does it as the free-tier quota allows).
 
 ## 4. What I built
 
@@ -152,7 +164,7 @@ config/sources/*.json
   -> fetch        direct -> Wayback -> verified partner copy -> logged as unreachable
   -> extract      HTML or PDF -> blocks -> sentences b{block}.s{n}; JSON-LD metadata
   -> select       LLM returns sentence-id spans + section, topic, claim type
-  -> verify       V1..V6 -> SQLite
+  -> verify       V1..V7 -> SQLite
   -> digest       14-day window -> supersession -> Markdown -> LLM section summaries
   -> publish      data/quotes.json, digests/, logs/, dashboard (GitHub Pages)
 ```
@@ -204,7 +216,8 @@ mqc digest --date 2026-11-19                            # rebuild one digest fro
 mqc site                                                # build the dashboard into site/
 mqc eval template --date 2026-11-18                     # blank labelling file for one day
 mqc eval score                                          # precision and recall against the labels
-pytest                                                  # 94 tests, no network needed
+mqc reselect --start 2026-11-18 --end 2026-11-18        # re-run quote selection for processed articles
+pytest                                                  # 106 tests, no network needed
 ```
 
 The LLM can be any OpenAI-compatible endpoint. `MQC_LLM_MODELS` is an ordered fallback list (default `gemini-3.8-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite`), and responses are cached by request hash.
@@ -214,6 +227,6 @@ The LLM can be any OpenAI-compatible endpoint. `MQC_LLM_MODELS` is an ordered fa
 ## 7. Known limits
 
 - **Reuters coverage is partial.** It depends on finding a licensed partner copy, and older Reuters articles only go back as far as Bing's news index. Unreadable Reuters articles are listed with title, date and link, not hidden.
-- **Free-tier LLM capacity.** Gemini's free tier often answers 503 or 429, so collection catches up over several daily runs rather than in one. Most quotes so far were selected by the Lite fallback models, which pick generously: quote-selection precision on the labelled day is 43%.
+- **Free-tier LLM capacity.** Gemini's free tier often answers 503 or 429, so collection catches up over several daily runs rather than in one. Most quotes so far were selected by the Lite fallback models. Quote selection on the labelled day is at 58% precision and 50% recall with prompt v3.
 - **Outlets that block automated clients** cannot be added (ISW returned 403).
 - **Paywalled outlets** (FT, Bloomberg, The Economist) are out of reach by design (I7).
