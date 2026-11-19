@@ -6,288 +6,346 @@
       "url": "https://www.bbc.co.uk/news/articles/c32l507ev4v4o",
       "title": "Inside the old gas pipeline where Ukraine is fighting an underground war",
       "source_id": "bbc",
-      "relevant": null,
-      "material_quotes": []
+      "relevant": true,
+      "material_quotes": [
+        "For the past seven months Ukrainian forces have been living and fighting Russian troops in an old Soviet gas pipeline in the north-eastern Kharkiv region.",
+        "But it is relatively safe from the drones that now saturate the skies above the front line – and make it nigh-on impossible for either side to advance.",
+        "Operation Veles, named after a mythical Slavic god of the underworld, began in April. Since then Ukraine has advanced 15km (9.3 miles) along the pipeline.",
+        "Over the course of the operation Ukraine says it killed more than 100 Russian soldiers and took 30 prisoners.",
+        "Foreign fighters have helped boost Ukraine's depleted ranks.",
+        "But Zanuda, who is chief of the planning section of the 13th Khartiia Brigade, believes it is the best way to fight in the future. \"Ground operations are now nearly impossible,\" he said, adding that \"everyone understands, for now, the only way to fight is underground\".",
+        "It has helped retake lost territory and been a boost for morale, but on its own it has not changed the course of the war."
+      ]
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/c6742m39xgzxo",
       "title": "Anthropic raises $81bn in record-breaking stock market debut",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/c6lyw490z14jo",
       "title": "Parents jailed for torture and death of four-year-old girl in France nearly 40 years ago",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/c6x284pnn4e2o",
       "title": "Julio Iglesias faces court investigation over alleged sexual offences",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/c9n70gd320mpo",
       "title": "Steve Rosenberg: Historic talks with Xi and Trump are a coup for Putin",
       "source_id": "bbc",
-      "relevant": null,
-      "material_quotes": []
+      "relevant": true,
+      "material_quotes": [
+        "\"We see such examples in the failed attempts to isolate our country, Russia, which has faced unprecedented sanctions pressure,\" Putin told a business forum of the Asia-Pacific Economic Co-operation organisation.",
+        "It allows him to play global statesman, even as the Russian military continues to pound Ukrainian towns and cities, and the Kremlin continues to reject the idea of an unconditional, comprehensive ceasefire.",
+        "Among European leaders, and especially in Ukraine, there is concern that the three-way meeting might produce more than just a pretty picture, though not in a good way for Kyiv.",
+        "Donald Trump has already said that in Shenzhen he wants to discuss his \"favourite subject\" - the war in Ukraine.",
+        "\"We really don't want this to turn into 'Yalta 2, 3, 4' with a redistribution of influence,\" said Zelensky.",
+        "Nearly five years after President Putin launched his so-called \"special military operation\", Russia is still struggling to win its war on Ukraine.",
+        "And the Ukrainian strike on the road bridge linking Russia to the Crimean Peninsula – carried out on the eve of the summit - was a blow to Moscow's prestige."
+      ]
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cj4gnpzll020o",
       "title": "Simon Jack: Can Anthropic's record-breaking IPO stop the AI bubble bursting?",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/ck792dez8dp3o",
       "title": "Falcon 6X: Why Ghana is facing backlash over new $60m presidential jet",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/ck9d75x5wwwwo",
       "title": "Trump shakes hands with Putin and Xi ahead of historic talks in China",
       "source_id": "bbc",
-      "relevant": null,
-      "material_quotes": []
+      "relevant": true,
+      "material_quotes": [
+        "Trump and Putin are expected to hold one-on-one talks on the sidelines of the summit on Thursday, in which the war in Ukraine could be discussed.",
+        "Kremlin spokesman Dmitry Peskov said Putin and Trump have not yet held a substantive meeting, and merely greeted each other on Wednesday.",
+        "Ukrainian President Volodymyr Zelensky has raised fears of a plan to end the war being discussed in the absence of representatives from Kyiv or Europe.",
+        "China has officially remained neutral since Putin launched a full-scale invasion of Ukraine in 2022, rejecting accusations from Kyiv and its allies that it has been tacitly supporting Moscow, including by exporting dual-use technology used by the Russian military.",
+        "Wednesday's handshake was the first in-person meeting between Trump and Putin since August 2025, when the Russian leader travelled to Alaska for talks on the Ukraine war which failed to deliver a breakthrough.",
+        "Several hours before Trump's arrival, Putin landed in Shenzhen and held around two hours of talks with Xi, with whom he has pressed for closer economic and defence relations."
+      ]
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cm15ezz8n394o",
       "title": "Pakistani man sentenced to 27 years for Iran-backed plot to kill Trump",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cm2d93z0e9gjo",
       "title": "Fiona the hippo undergoing care after swallowing a hat at Cincinnati Zoo",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cm2d93zpnyxeo",
       "title": "Surrey group completes Heathrow to Rome Fiat 500 challenge",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cm87987w1qz5o",
       "title": "British hacker who stole $11m jailed for six years in US",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cmd7159vlr85o",
       "title": "Anthropic: The seven founders about to become multi-billionaires",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cmgrenln8p29o",
       "title": "Google declines UK request for Russell Brand YouTube video to be removed, sources say",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cmy49873dn95o",
       "title": "Hakeem Jeffries nominated to be US Speaker of the House",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cmy86pp336qlo",
       "title": "Waymo temporarily pulls driverless taxis from all US freeways",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cq20xg80ly47o",
       "title": "Russian arrested for spying on US defence company Palantir over Ukraine support",
       "source_id": "bbc",
-      "relevant": null,
-      "material_quotes": []
+      "relevant": true,
+      "material_quotes": [
+        "A Russian man has been arrested in California's Silicon Valley for allegedly attempting to spy on employees of a technology and defence firm that supports the Ukrainian military.",
+        "\"The allegations in this case describe a state-sponsored operation to target and harass employees of an American technology and defense company because of that company's assistance to Ukraine in its war with Russia,\" said US Attorney for the Northern District of California Craig Missakian.",
+        "They added that the company has been \"targeted extensively\" by Russia over its involvement in Ukraine, and that the attacks are becoming \"increasingly aggressive\"."
+      ]
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cq4gn3109pzgo",
       "title": "The EU that Burnham is eyeing up is very different to the one Britain left",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cq62ped2ypy4o",
       "title": "William and Kate meet PM Modi as they wrap up India tour",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cqev3v2ygzlvo",
       "title": "Democrat Mary Peltola unseats Republican in Alaska Senate race",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/crkgvxxwpwz2o",
       "title": "Rubio says tech outages are not part of 'systemic attack' against US",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cw4gn9jeqjq7o",
       "title": "Kuwait says it repelled first Iranian attack in two months after US strikes island",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cw8r7510degno",
       "title": "Israeli military completes ground operation in Gaza beyond Yellow Line",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cw8r75xm8v4po",
       "title": "GTA 6 reviews say highly-anticipated game is a masterpiece",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.bbc.co.uk/news/articles/cx053jrv9rz9o",
       "title": "Lobito Corridor: Can Trump-backed mineral highway bring peace and prosperity to DR Congo and Angola?",
       "source_id": "bbc",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://kyivindependent.com/russia-will-achieve-none-of-its-objectives-zelensky-details-upcoming-allies-meeting/",
       "title": "'Russia will achieve none of its objectives' — Zelensky details upcoming allies meeting",
       "source_id": "kyivindependent",
-      "relevant": null,
-      "material_quotes": []
+      "relevant": true,
+      "material_quotes": [
+        "\"Every decision that strengthens Ukraine’s capabilities, and every step taken to increase support for Ukraine, sends an absolutely clear signal to Russia: the war must end, and Russia will achieve none of its objectives through this war,\" Zelensky said .",
+        "The primary objective of the meeting, Zelensky said, is to secure additional support for Ukraine's air defenses and energy sector . This comes as Russian forces continue to bombard energy infrastructure across Ukraine ahead of the looming winter, and as Starlink restrictions and air defense shortages hamper Kyiv's ability to respond to these threats.",
+        "Through the summit, Zelensky said progress had been made on securing additional F-16 fighter jets for Ukraine.",
+        "He praised the European Commission's newly approved legislative proposals to provide up to €45 billion ($49.5 billion) in additional financial support to Ukraine in 2027.",
+        "The meeting in China comes just over a week after Ukrainian, U.S., and Russian teams met in Abu Dhabi for trilateral peace negotiations.",
+        "\"We and our European partners share a clear, unified position: issues concerning Ukraine must be resolved with Ukraine’s participation, and issues concerning Europe must be resolved with Europe’s participation,\" Zelensky said. \"That is the only approach that will be taken.\""
+      ]
     },
     {
       "url": "https://kyivindependent.com/ukraine-war-latest-drones-strike-2-russian-oil-refineries-in-krasnodar-krai-kyiv-says/",
       "title": "Ukraine war latest: Drones strike 2 Russian oil refineries in Krasnodar Krai, Kyiv says",
       "source_id": "kyivindependent",
-      "relevant": null,
-      "material_quotes": []
+      "relevant": true,
+      "material_quotes": [
+        "Ukrainian forces struck two oil refineries in Russia's southern Krasnodar Krai in an overnight attack on Nov. 17 to 18, Ukraine's General Staff confirmed on Nov. 18.",
+        "The attacks are part of Ukraine's greater campaign against Russian oil infrastructure, aimed at disrupting fuel supplies to Moscow's military and reducing revenue supporting its war against Ukraine.",
+        "\"Every fire at (these refineries) means less diesel and gasoline for the Russian army and fewer oil rubles, with which the Russian aggressor buys missiles and rockets,\" the General Staff said in its announcement .",
+        "Repeated Russian attacks on the city center of Odesa, a major port city in southern Ukraine, killed four people and injured nine others on Nov. 18, Odesa Oblast Governor Oleh Kiper said.",
+        "Ukraine and Russia, with U.S. mediation, have been negotiating a new humanitarian mission modeled on the recent operation in Russian-occupied Oleshky, Ukrainian human rights ombudsman Dmytro Lubinets said on Nov. 18.",
+        "Lubinets said that negotiations with Russia remain \"difficult\" and \"quite cynical,\" but he believes the Russian side was prepared to discuss further missions, given Ukraine's previous experience of working with Russian Human Rights Commissioner Yana Lantratova.",
+        "Russian intelligence services were preparing a sabotage and false-flag operation near Poland's border with Russia's Kaliningrad exclave in late October or early November, meant to blame Ukraine for the attack to undermine Western aid to Kyiv, Polish newspaper Rzeczpospolita reported on Nov. 18.",
+        "The European Commission on Nov. 18 approved a set of legislative proposals to provide up to €45 billion ($49.5 billion) in additional financial support to Ukraine in 2027.",
+        "The additional funds help to address the country's estimated €70 billion financing gap for next year, the commission said .",
+        "Ukraine will be required to repay the principal only once it receives reparations from Russia."
+      ]
     },
     {
       "url": "https://kyivindependent.com/ukrainian-influencer-accused-of-fraud-money-laundering-arrested-by-italian-police/",
       "title": "Ukrainian influencer accused of fraud, money laundering arrested by Italian police",
       "source_id": "kyivindependent",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://kyivindependent.com/unacceptable-attempt-at-intimidation-russian-man-charged-with-spying-targeting-silicon-valley/",
       "title": "'Unacceptable attempt at intimidation' — Russian man charged with spying, targeting Silicon Valley",
       "source_id": "kyivindependent",
-      "relevant": null,
-      "material_quotes": []
+      "relevant": true,
+      "material_quotes": [
+        "The announcement from the U.S. DOJ follows similar revelations of Russian spies across multiple countries in recent months.",
+        "“The allegations in this case describe a state-sponsored operation to target and harass employees of an American technology and defense company because of that company’s assistance to Ukraine in its war with Russia,” U.S. Attorney for the Northern District of California Craig H. Missakian said in a statement . “We will not tolerate any efforts — by foreign governments or otherwise — to turn Silicon Valley into a base for foreign intelligence operations."
+      ]
     },
     {
       "url": "https://www.reuters.com/business/aerospace-defense/operation-vivaldi-ukraine-melds-man-machine-repel-russians-2026-11-18/",
       "title": "Operation Vivaldi: Ukraine melds man and machine to repel Russians",
       "source_id": "reuters",
-      "relevant": null,
+      "relevant": true,
       "material_quotes": []
     },
     {
       "url": "https://www.reuters.com/business/aerospace-defense/russian-military-aircraft-deployment-sends-potent-message-asia-2026-11-18/",
       "title": "Russian military aircraft deployment sends potent message to Asia",
       "source_id": "reuters",
-      "relevant": null,
-      "material_quotes": []
+      "relevant": true,
+      "material_quotes": [
+        "\"The deployment is clearly intended to remind regional states that, despite ongoing war in Ukraine, Moscow can still project power into Southeast Asia,\" said Ian Storey, a security scholar at Singapore's ISEAS-Yusof Ishak Institute."
+      ]
     },
     {
       "url": "https://www.reuters.com/business/energy/drone-attacks-nearly-halve-russias-november-oil-refining-sources-say-2026-11-18/",
       "title": "Drone attacks nearly halve Russia's November oil refining, sources say",
       "source_id": "reuters",
-      "relevant": null,
+      "relevant": true,
       "material_quotes": []
     },
     {
       "url": "https://www.reuters.com/business/energy/putin-says-eus-russian-energy-ban-caused-humiliating-fall-eu-living-standards-2026-11-18/",
       "title": "Putin says EU's Russian energy ban caused a 'humiliating' fall in EU living standards",
       "source_id": "reuters",
-      "relevant": null,
+      "relevant": true,
       "material_quotes": []
     },
     {
       "url": "https://www.reuters.com/business/finance/italy-leaning-towards-unconditional-approval-intesa-takeover-bid-mps-sources-say-2026-11-18/",
       "title": "Italy leaning towards unconditional approval of Intesa's MPS bid, sources say",
       "source_id": "reuters",
-      "relevant": null,
+      "relevant": false,
       "material_quotes": []
     },
     {
       "url": "https://www.reuters.com/world/china/trumps-historic-meeting-with-xi-putin-headlines-asia-trip-2026-11-18/",
       "title": "China and Russia release 'peace declaration' after Trump, Xi, Putin meeting",
       "source_id": "reuters",
-      "relevant": null,
+      "relevant": true,
       "material_quotes": []
     },
     {
       "url": "https://www.reuters.com/world/china/ukraines-european-allies-meet-berlin-show-support-2026-11-19/",
       "title": "Ukraine's European allies meet in Berlin in show of support",
       "source_id": "reuters",
-      "relevant": null,
+      "relevant": true,
       "material_quotes": []
     },
     {
       "url": "https://www.reuters.com/world/chinas-xi-calls-free-open-trade-apec-summit-2026-11-18/",
       "title": "Xi, Putin blast Western 'protectionism' and sanctions as Trump lands in China",
       "source_id": "reuters",
-      "relevant": null,
+      "relevant": true,
       "material_quotes": []
     },
     {
       "url": "https://www.reuters.com/world/eu-proposes-new-45-billion-loan-ukraine-2027-be-repaid-by-russia-2026-11-18/",
       "title": "EU proposes €45 billion Ukraine loan, to be repaid after Russia pays reparations",
       "source_id": "reuters",
-      "relevant": null,
+      "relevant": true,
       "material_quotes": []
     },
     {
       "url": "https://www.reuters.com/world/europe/russian-attacks-ukrainian-city-odesa-kill-four-officials-say-2026-11-18/",
       "title": "Russian attacks on Ukrainian city of Odesa kill four, officials say",
       "source_id": "reuters",
-      "relevant": null,
+      "relevant": true,
       "material_quotes": []
     },
     {
       "url": "https://www.reuters.com/world/russia-says-us-despite-current-sanctions-will-likely-need-more-its-uranium-2026-11-18/",
       "title": "Russia says US, despite current sanctions, will likely need more of its uranium in future",
       "source_id": "reuters",
-      "relevant": null,
+      "relevant": true,
       "material_quotes": []
     },
     {
       "url": "https://www.reuters.com/world/trump-envoys-witkoff-kushner-expected-berlin-ukraine-talks-says-us-2026-11-18/",
       "title": "Trump envoys Witkoff and Kushner expected in Berlin for Ukraine talks, says US",
       "source_id": "reuters",
-      "relevant": null,
-      "material_quotes": []
+      "relevant": true,
+      "material_quotes": [
+        "WASHINGTON, Nov 18 (Reuters) - US diplomatic envoys Steve Witkoff and Jared Kushner are expected in Berlin on Thursday to meet Ukrainian officials and a European negotiating team as they ramp up efforts to end Russia's war in Ukraine, a US official said on Wednesday.",
+        "The meetings will focus on further developing \"credible post-war security guarantees\" for Ukraine, advancing a comprehensive economic recovery plan, and preparing for the next round of multilateral talks, the official said.",
+        "Russian, Ukrainian and US officials held talks in Abu Dhabi last week for the first time in nine months to end the conflict.",
+        "Kushner and Witkoff then met Russian President Vladimir Putin in Moscow and said afterwards that Europe would take part in the next round of negotiations.",
+        "While Kushner said in a social media post on Monday that progress was being made, the two sides do not appear to be close to an agreement. Russia wants Ukraine's Donbas region in exchange for peace and Ukraine is loathe to cede territory.",
+        "The US official said the American team is speaking multiple times a day with Ukrainian and European partners as they work together in an attempt to \"advance proposals for a durable peace.\""
+      ]
     }
-  ]
+  ],
+  "labelled_by": "Independent model labels from article text only, blind to the system's selections; pending review by the author."
 }
