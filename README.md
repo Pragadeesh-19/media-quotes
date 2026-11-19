@@ -133,7 +133,7 @@ Things failed constantly, and each failure became a rule:
 - **Every decision is logged.** `logs/<run_id>.jsonl` records each discovery, relevance verdict with matched terms, rejected quote with the rule that rejected it, dropped speaker, and supersession with its reason.
 - **Git history is an audit trail.** The daily job commits the database, the JSON export and the digest, so each day's additions are a visible diff.
 - **Tests.** 93 tests run on every push without network access, against saved real BBC, AOL and Bing pages. They cover every verification rule (including frankenquote attempts), the fetch chain under 401, 429 and timeouts, supersession, verbatim rendering, backfill, onboarding and PDFs.
-- **Evaluation.** `mqc eval template --date D` writes a blind labelling file for a day (the system's decisions are not shown). `mqc eval score` reports precision and recall for article detection and, at sentence level, quote selection. No hand-labelled days are committed yet, so this repository makes no recall or precision claim.
+- **Evaluation.** `mqc eval template --date D` writes a blind labelling file for a day (the system's decisions are not shown). `mqc eval score` reports precision and recall for article detection and, at sentence level, quote selection, and writes `eval/results.md`. The template for 18 November ([`eval/labels/2026-11-18.json`](eval/labels/2026-11-18.json), 41 articles) is committed but not yet labelled, so this repository makes no recall or precision claim yet. Unreachable Reuters articles count as misses when labelled relevant, because they really were not collected.
 
 ## 4. What I built
 

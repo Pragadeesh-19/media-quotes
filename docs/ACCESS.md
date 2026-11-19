@@ -45,3 +45,13 @@ Unreachable Reuters articles stay in the database with their title, date and lin
 4. The stored article keeps the reuters.com URL, the Reuters headline and the feed date. `retrieval_method = syndication` and `retrieval_url` record where the text was read. The digest marks these quotes "via syndication copy".
 
 Rejected pages and their reasons are in the run log, so every decision can be checked.
+
+## Cumulative coverage after the backfill (2026-11-19, all runs)
+
+| Source | Discovered | Set aside before fetching (no war term) | Read | How read | Unreachable |
+|--------|-----------:|----------------------------------------:|-----:|----------|------------:|
+| BBC | 1,584 | 1,343 | 241 | direct | 0 |
+| The Kyiv Independent | 297 | 4 | 293 | 290 direct, 3 Wayback | 0 |
+| Reuters | 81 | 2 | 24 (30% of 79) | partner copy | 55 |
+
+The Kyiv Independent was added with `mqc add-source https://kyivindependent.com/`. ISW (understandingwar.org) was tried first: its homepage returns 403 to our client and its feeds and sub-sitemaps are blocked, so `add-source` refused it with that reason.
